@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gramdie Games</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Source+Code+Pro:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Variáveis de Cores para os Temas */
+        :root {
+            --bg-color: #1C1C1C;
+            --text-color: #ffffff;
+            --logo-games-color: #AAAAAA;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #FFFFF0;
+            --text-color: #1C1C1C;
+            --logo-games-color: #555555;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inclusive Sans', sans-serif;
+            margin: 0;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Header Organizado */
+        header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between; /* Espaça logo e botões */
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: baseline;
+        }
+
+        .logo-gramdie {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo-games {
+            font-size: 16px;
+            margin-left: 5px;
+            color: var(--logo-games-color);
+        }
+
+        /* Área de Botões à Direita */
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            font-family: 'Inclusive Sans', sans-serif;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-blue { background-color: #1E90FF; }
+        .btn:active { opacity: 0.5; }
+
+        /* Ícones */
+        .btn i { font-size: 18px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <span class="logo-gramdie">Gramdie</span><span class="logo-games">Games</span>
+        </div>
+
+        <div class="nav-buttons">
+            <button id="theme-toggle" class="btn btn-blue" title="Mudar Tema">
+                <i id="theme-icon" class="fa-solid fa-sun"></i>
+            </button>
+
+            <button class="btn btn-blue" onclick="location.href='login.html'">
+                <i class="fa-regular fa-circle-user"></i>
+                Login
+            </button>
+        </div>
+    </header>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const body = document.body;
+
+        // Função para definir Cookie
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
+        }
+
+        // Função para ler Cookie
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for(let i=0;i < ca.length;i++) {
+                let c = ca[i];
+                while (c.charAt(0)==' ') c = c.substring(1,c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+            }
+            return null;
+        }
+
+        // Aplicar tema salvo ao carregar
+        const savedTheme = getCookie("theme") || "dark";
+        applyTheme(savedTheme);
+
+        function applyTheme(theme) {
+            if (theme === "light") {
+                body.setAttribute('data-theme', 'light');
+                themeIcon.classList.replace('fa-sun', 'fa-moon');
+            } else {
+                body.removeAttribute('data-theme');
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+            }
+        }
+
+        // Evento de clique para trocar tema
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            applyTheme(newTheme);
+            setCookie("theme", newTheme, 30); // Salva por 30 dias
+        });
+    </script>
+</body>
+</html>
