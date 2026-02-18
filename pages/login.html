@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Gramdie Games</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Source+Code+Pro:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Aplicando suas regras de cores e fontes */
+        body {
+            background-color: #1C1C1C;
+            color: white;
+            font-family: 'Inclusive Sans', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        /* Container do formulário */
+        .login-card {
+            background-color: #262626; /* Um cinza levemente mais claro que o fundo */
+            padding: 40px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 350px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .logo-container {
+            margin-bottom: 30px;
+        }
+
+        .logo-gramdie {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        /* Estilização dos Inputs */
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border-radius: 12px; /* Suas bordas arredondadas */
+            border: 1px solid #444;
+            background-color: #1C1C1C;
+            color: white;
+            font-family: 'Inclusive Sans', sans-serif;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #1E90FF; /* Cor azul ao clicar */
+        }
+
+        /* Botões seguindo suas regras específicas */
+        .btn {
+            width: 100%;
+            font-family: 'Inclusive Sans', sans-serif;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: opacity 0.2s ease;
+            margin-bottom: 10px;
+        }
+
+        .btn-blue { background-color: #1E90FF; }
+        .btn-red { background-color: #FF4444; }
+
+        .btn:active {
+            opacity: 0.5; /* Transparência ao clicar conforme solicitado */
+        }
+
+        .links-auxiliares {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .links-auxiliares a {
+            color: #1E90FF;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="logo-container">
+            <span class="logo-gramdie">Gramdie</span>
+        </div>
+
+        <div class="input-group">
+            <label>E-mail</label>
+            <input type="email" id="email" placeholder="seu@email.com">
+        </div>
+
+        <div class="input-group">
+            <label>Senha</label>
+            <input type="password" id="password" placeholder="••••••••">
+        </div>
+
+        <button class="btn btn-blue" onclick="login()">Entrar</button>
+        <button class="btn btn-red" onclick="window.location.href='../index.html'">Cancelar</button>
+
+        <div class="links-auxiliares">
+            <p>Esqueceu a senha? <a href="#">Clique aqui</a></p>
+        </div>
+    </div>
+
+    <script>
+        function login() {
+            const email = document.getElementById('email').value;
+            alert("Tentando conectar: " + email + "\n\nO próximo passo é ligar isso ao Supabase!");
+        }
+    </script>
+
+</body>
+</html>
