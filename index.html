@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* Variáveis de Cores para os Temas */
+        /* Regras de Cores e Temas */
         :root {
             --bg-color: #1C1C1C;
             --text-color: #ffffff;
@@ -30,11 +30,10 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Header Organizado */
         header {
             padding: 20px;
             display: flex;
-            justify-content: space-between; /* Espaça logo e botões */
+            justify-content: space-between;
             align-items: center;
         }
 
@@ -55,31 +54,37 @@
             color: var(--logo-games-color);
         }
 
-        /* Área de Botões à Direita */
         .nav-buttons {
             display: flex;
             gap: 15px;
         }
 
+        /* Regras dos Botões */
         .btn {
             font-family: 'Inclusive Sans', sans-serif;
             color: white;
+            background-color: #1E90FF;
             border: none;
             border-radius: 12px;
-            padding: 10px 15px;
+            padding: 10px 20px;
             cursor: pointer;
-            transition: opacity 0.2s ease;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
+            font-size: 16px;
+            transition: 0.2s ease;
         }
 
-        .btn-blue { background-color: #1E90FF; }
-        .btn:active { opacity: 0.5; }
+        /* Efeito de Transparência solicitado: afeta fundo e texto */
+        .btn:active {
+            opacity: 0.5;
+            color: rgba(255, 255, 255, 0.5);
+        }
 
-        /* Ícones */
-        .btn i { font-size: 18px; }
+        .container {
+            padding: 80px 40px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -90,30 +95,33 @@
         </div>
 
         <div class="nav-buttons">
-            <button id="theme-toggle" class="btn btn-blue" title="Mudar Tema">
+            <button id="theme-toggle" class="btn" title="Mudar Tema">
                 <i id="theme-icon" class="fa-solid fa-sun"></i>
             </button>
 
-            <button class="btn btn-blue" onclick="location.href='login.html'">
+            <button class="btn" onclick="location.href='pages/login.html'">
                 <i class="fa-regular fa-circle-user"></i>
                 Login
             </button>
         </div>
     </header>
 
+    <div class="container">
+        <h1>Bem-vindo à Gramdie Games</h1>
+        <p>Acesse com seu Nickname para gerenciar seus jogos.</p>
+    </div>
+
     <script>
         const themeToggle = document.getElementById('theme-toggle');
         const themeIcon = document.getElementById('theme-icon');
         const body = document.body;
 
-        // Função para definir Cookie
         function setCookie(name, value, days) {
             const date = new Date();
             date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
             document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
         }
 
-        // Função para ler Cookie
         function getCookie(name) {
             const nameEQ = name + "=";
             const ca = document.cookie.split(';');
@@ -125,27 +133,24 @@
             return null;
         }
 
-        // Aplicar tema salvo ao carregar
+        // Aplicar tema salvo
         const savedTheme = getCookie("theme") || "dark";
-        applyTheme(savedTheme);
-
-        function applyTheme(theme) {
-            if (theme === "light") {
-                body.setAttribute('data-theme', 'light');
-                themeIcon.classList.replace('fa-sun', 'fa-moon');
-            } else {
-                body.removeAttribute('data-theme');
-                themeIcon.classList.replace('fa-moon', 'fa-sun');
-            }
+        if (savedTheme === "light") {
+            body.setAttribute('data-theme', 'light');
+            themeIcon.classList.replace('fa-sun', 'fa-moon');
         }
 
-        // Evento de clique para trocar tema
         themeToggle.addEventListener('click', () => {
-            const currentTheme = body.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            applyTheme(newTheme);
-            setCookie("theme", newTheme, 30); // Salva por 30 dias
+            const isLight = body.hasAttribute('data-theme');
+            if (isLight) {
+                body.removeAttribute('data-theme');
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+                setCookie("theme", "dark", 30);
+            } else {
+                body.setAttribute('data-theme', 'light');
+                themeIcon.classList.replace('fa-sun', 'fa-moon');
+                setCookie("theme", "light", 30);
+            }
         });
     </script>
 </body>
