@@ -1,11 +1,10 @@
-// Configuração direta do Supabase
+// Configurações do Supabase
 const SUPABASE_URL = 'https://vhybulaqduktgwxqbzn.supabase.co';
-const SUPABASE_KEY = 'SUA_ANONYMOUS_KEY_AQUI'; // <--- PEGUE A "Copy anonymous API key" DA SUA IMAGEM
+const SUPABASE_KEY = 'SUA_CHAVE_AQUI'; // <--- COLE AQUI A "anon public key"
 
-// Inicializa o cliente (O "_" antes do nome evita conflitos)
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Seleciona os elementos da página
+// Elementos da página
 const title = document.getElementById('title');
 const mainBtn = document.getElementById('mainBtn');
 const toggleLink = document.getElementById('toggleLink');
@@ -14,7 +13,7 @@ const passInput = document.getElementById('pass');
 
 let isLoginMode = true;
 
-// Função para alternar entre as telas de Login e Cadastro
+// FUNÇÃO PARA ALTERNAR (O que não está funcionando no seu)
 toggleLink.onclick = (e) => {
     e.preventDefault();
     isLoginMode = !isLoginMode;
@@ -23,47 +22,34 @@ toggleLink.onclick = (e) => {
     toggleLink.innerText = isLoginMode ? 'Não tem conta? Criar agora' : 'Já tem conta? Fazer Login';
 };
 
-// Lógica de Autenticação
+// FUNÇÃO DE CLIQUE NO BOTÃO
 mainBtn.onclick = async () => {
     const nick = nickInput.value.trim();
     const pass = passInput.value;
 
-    if (!nick || !pass) {
-        return alert("Por favor, preencha o Nickname e a Senha.");
-    }
+    if (!nick || !pass) return alert("Preencha tudo!");
 
-    // Criamos o identificador único "escondido" para o banco
-    const userEmail = `${nick.toLowerCase()}@gramdie.com`;
+    // O "e-mail invisível" para o Supabase aceitar apenas Nickname
+    const fakeEmail = `${nick.toLowerCase()}@gramdie.com`;
 
     if (isLoginMode) {
-        // Tentar ENTRAR
+        // Lógica de Login
         const { data, error } = await _supabase.auth.signInWithPassword({
-            email: userEmail,
+            email: fakeEmail,
             password: pass
         });
-
-        if (error) {
-            alert("Erro no login: " + error.message);
-        } else {
-            alert("Bem-vindo de volta, " + nick + "!");
+        if (error) alert("Erro no Login: " + error.message);
+        else {
+            alert("Sucesso! Bem-vindo " + nick);
             window.location.href = '../index.html';
         }
     } else {
-        // Tentar CADASTRAR
+        // Lógica de Cadastro
         const { data, error } = await _supabase.auth.signUp({
-            email: userEmail,
-            password: pass,
-            options: {
-                data: { display_name: nick } // Salva o nick original formatado
-            }
+            email: fakeEmail,
+            password: pass
         });
-
-        if (error) {
-            alert("Erro ao criar conta: " + error.message);
-        } else {
-            alert("Conta criada! Agora você já pode fazer login.");
-            // Volta para o modo login automaticamente
-            toggleLink.click();
-        }
+        if (error) alert("Erro no Cadastro: " + error.message);
+        else alert("Conta criada! Agora clique em 'Fazer Login' para entrar.");
     }
 };
