@@ -3,134 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gramdie Games</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Source+Code+Pro:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Postar Jogo | Gramdie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #1C1C1C; --card: #262626; --txt: #ffffff; --lg: #AAAAAA; --blue: #1E90FF; }
-        body { background-color: var(--bg); color: var(--txt); font-family: 'Inclusive Sans', sans-serif; margin: 0; }
-
-        /* Logo Corrigida: Games menor e cinza ao lado */
-        header { padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
-        .logo-container { display: flex; align-items: baseline; gap: 8px; }
-        .logo-gramdie { font-family: 'Source Code Pro', monospace; font-size: 28px; font-weight: bold; }
-        .logo-games { font-size: 18px; color: var(--lg); font-weight: normal; }
-
-        /* Grid e Cards Arredondados */
-        .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; padding: 40px; }
-        .game-card { background: var(--card); border-radius: 20px; overflow: hidden; transition: 0.3s; position: relative; border: 1px solid #333; }
-        .banner { width: 100%; height: 160px; object-fit: cover; background: #111; }
+        :root { --bg: #1C1C1C; --card: #262626; --blue: #1E90FF; --txt: #ffffff; }
+        body { background: var(--bg); color: var(--txt); font-family: 'Inclusive Sans', sans-serif; display: flex; justify-content: center; padding: 40px; margin: 0; }
         
-        .info { padding: 20px; }
-        .info h3 { margin: 0 0 10px 0; font-size: 20px; }
-        .description { font-size: 14px; color: var(--lg); margin-bottom: 15px; min-height: 40px; }
+        .form-container { background: var(--card); padding: 30px; border-radius: 24px; width: 100%; max-width: 600px; border: 1px solid #333; }
+        h2 { margin-top: 0; color: var(--blue); }
         
-        /* Sistema de Tags */
-        .tags-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
-        .tag { padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; background: #333; }
-        .tag-os { background: #444; color: #fff; }
-        .tag-cloud { background: rgba(30, 144, 255, 0.2); color: var(--blue); }
-        .tag-danger { background: rgba(255, 68, 68, 0.2); color: #ff4444; border: 1px solid #ff4444; }
-
-        /* Botão de Download Direto */
-        .dl-btn { display: inline-flex; align-items: center; gap: 8px; color: var(--blue); text-decoration: none; font-weight: bold; font-size: 14px; transition: 0.2s; }
-        .dl-btn:hover { text-decoration: underline; }
-
-        /* Botão Circular Flutuante (+) */
-        .add-btn { 
-            position: fixed; bottom: 30px; right: 30px; 
-            width: 65px; height: 65px; border-radius: 50%; 
-            background: var(--blue); color: white; border: none; 
-            font-size: 30px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-            display: flex; align-items: center; justify-content: center; z-index: 100;
+        label { display: block; margin-top: 15px; font-size: 14px; font-weight: bold; color: #888; }
+        input, textarea { 
+            width: 100%; padding: 12px; margin-top: 5px; border-radius: 12px; 
+            border: 1px solid #444; background: #111; color: white; box-sizing: border-box; 
+            font-family: inherit;
         }
-        .add-btn:active { opacity: 0.6; }
+        
+        .btn-post { 
+            background: var(--blue); color: white; border: none; padding: 18px; 
+            width: 100%; border-radius: 15px; font-weight: bold; cursor: pointer; 
+            margin-top: 30px; font-size: 16px; transition: 0.3s;
+        }
+        .btn-post:disabled { background: #555; cursor: not-allowed; }
+        
+        .info-text { font-size: 12px; color: #666; margin-top: 10px; text-align: center; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo-container">
-            <span class="logo-gramdie">Gramdie</span>
-            <span class="logo-games">Games</span>
-        </div>
-    </header>
+    <div class="form-container">
+        <h2>Postar Novo Jogo</h2>
+        
+        <label>Banner do Jogo (URL da Imagem)</label>
+        <input type="url" id="banner" placeholder="https://exemplo.com/imagem.png" required>
 
-    <div class="games-grid" id="gamesContainer">
-        </div>
+        <label>Título (Máx 40 caracteres)</label>
+        <input type="text" id="title" maxlength="40" placeholder="Nome do seu jogo" required>
 
-    <button class="add-btn" onclick="location.href='pages/creategame.html'">+</button>
+        <label>Descrição (Opcional - Máx 1200)</label>
+        <textarea id="desc" rows="5" maxlength="1200" placeholder="Fale sobre o jogo..."></textarea>
+
+        <label>Link de Download (Obrigatório)</label>
+        <input type="url" id="mainLink" placeholder="Link do Mega, Drive, Mediafire..." required>
+
+        <label>Outros Links (Opcional - Ex: Redes Sociais, Requisitos)</label>
+        <input type="url" id="extra1" placeholder="Link extra 1">
+        <input type="url" id="extra2" placeholder="Link extra 2">
+
+        <label>Seu Nome ou Nick (Vazio para Anônimo)</label>
+        <input type="text" id="author" placeholder="Ex: GramdiePlayer">
+
+        <button class="btn-post" id="btnPublish">Publicar no Repositório</button>
+        <p class="info-text">Seu post será enviado como um arquivo JSON para o repositório oficial.</p>
+    </div>
 
     <script>
-        // Configuração do Repositório de Armazenamento
-        const REPO_OWNER = 'Gramdie';
-        const REPO_NAME = 'Gramdie-repository-for-games';
-        
-        // Função para identificar o ícone da Cloud pelo Link
-        function getCloudIcon(url) {
-            const clouds = [
-                { name: 'Google Drive', icon: 'fab fa-google-drive', match: 'drive.google.com' },
-                { name: 'MEGA', icon: 'fas fa-cloud', match: 'mega.nz' },
-                { name: 'Mediafire', icon: 'fas fa-download', match: 'mediafire.com' },
-                { name: 'OneDrive', icon: 'fab fa-microsoft', match: '1drv.ms' },
-                { name: 'Terabox', icon: 'fas fa-box-open', match: 'terabox.com' }
-            ];
-            const found = clouds.find(c => url.toLowerCase().includes(c.match));
-            return found ? `<span class="tag tag-cloud"><i class="${found.icon}"></i> ${found.name}</span>` : `<span class="tag">${url.split('/')[2]}</span>`;
-        }
+        // CONFIGURAÇÕES DO GITHUB
+        const GITHUB_USER = 'Gramdie';
+        const GITHUB_REPO = 'Gramdie-repository-for-games';
+        const GITHUB_TOKEN = 'COLE_SEU_TOKEN_AQUI'; // <--- VOCÊ PRECISA GERAR UM TOKEN (PAT) NO GITHUB
 
-        // Função para identificar OS pela extensão
-        function getOSTags(url) {
-            const ext = url.split('.').pop().toLowerCase();
-            if (['exe', 'msi'].includes(ext)) return '<span class="tag tag-os"><i class="fab fa-windows"></i> Windows</span>';
-            if (['apk'].includes(ext)) return '<span class="tag tag-os"><i class="fab fa-android"></i> Android</span>';
-            if (['dmg', 'pkg'].includes(ext)) return '<span class="tag tag-os"><i class="fab fa-apple"></i> MacOS</span>';
-            return ''; 
-        }
+        document.getElementById('btnPublish').onclick = async () => {
+            const btn = document.getElementById('btnPublish');
+            
+            // Dados do Post
+            const gameData = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('desc').value,
+                banner: document.getElementById('banner').value,
+                mainLink: document.getElementById('mainLink').value,
+                extras: [document.getElementById('extra1').value, document.getElementById('extra2').value],
+                author: document.getElementById('author').value || Math.floor(100000000 + Math.random() * 900000000),
+                timestamp: new Date().getTime()
+            };
 
-        // Carregar jogos do repositório via GitHub API
-        async function loadGames() {
-            const container = document.getElementById('gamesContainer');
-            try {
-                // Buscamos a lista de arquivos JSON no repositório
-                const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/posts`);
-                const files = await response.json();
-
-                for (let file of files) {
-                    if (file.name.endsWith('.json')) {
-                        const rawData = await fetch(file.download_url);
-                        const game = await rawData.json();
-                        
-                        // Lógica da descrição (90 chars)
-                        const shortDesc = game.description.length > 90 ? game.description.substring(0, 90) + "..." : game.description;
-
-                        const card = `
-                            <div class="game-card">
-                                <img src="${game.banner}" class="banner" onerror="this.src='https://via.placeholder.com/300x160/111/fff?text=Gramdie+Games'">
-                                <div class="info">
-                                    <h3>${game.title}</h3>
-                                    <p class="description">${shortDesc}</p>
-                                    <div class="tags-container">
-                                        ${getOSTags(game.mainLink)}
-                                        ${getCloudIcon(game.mainLink)}
-                                    </div>
-                                    <a href="${game.mainLink}" target="_blank" class="dl-btn">
-                                        <i class="fas fa-external-link-alt"></i> Download Direto
-                                    </a>
-                                    <p style="font-size:11px; color:#555; margin-top:10px;">Autor: ${game.author}</p>
-                                </div>
-                            </div>
-                        `;
-                        container.innerHTML += card;
-                    }
-                }
-            } catch (e) {
-                console.error("Erro ao carregar repositório:", e);
-                container.innerHTML = "<p>Nenhum jogo postado ainda ou erro na conexão.</p>";
+            if (!gameData.title || !gameData.mainLink) {
+                return alert("Por favor, preencha o Título e o Link de Download!");
             }
-        }
 
-        window.onload = loadGames;
+            btn.disabled = true;
+            btn.innerText = "Enviando para a Nuvem...";
+
+            // Criar nome do arquivo único
+            const fileName = `post_${gameData.timestamp}.json`;
+            
+            // Transformar JSON em Base64 (Exigência da API do GitHub)
+            const contentRaw = JSON.stringify(gameData, null, 2);
+            const contentBase64 = btoa(unescape(encodeURIComponent(contentRaw)));
+
+            try {
+                const response = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/posts/${fileName}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Novo post: ${gameData.title}`,
+                        content: contentBase64
+                    })
+                });
+
+                if (response.ok) {
+                    alert("Sucesso! O jogo foi postado e aparecerá no site em instantes.");
+                    window.location.href = '../index.html';
+                } else {
+                    const errorData = await response.json();
+                    alert("Erro ao publicar: " + (errorData.message || "Verifique o Token do GitHub"));
+                    btn.disabled = false;
+                    btn.innerText = "Publicar no Repositório";
+                }
+            } catch (err) {
+                alert("Erro de conexão com o GitHub.");
+                btn.disabled = false;
+                btn.innerText = "Publicar no Repositório";
+            }
+        };
     </script>
 </body>
 </html>
