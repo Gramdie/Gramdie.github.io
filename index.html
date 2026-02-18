@@ -3,155 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gramdie Games</title>
-    
+    <title>Gramdie Games | Comunidade</title>
     <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Source+Code+Pro:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
-        /* Regras de Cores e Temas */
-        :root {
-            --bg-color: #1C1C1C;
-            --text-color: #ffffff;
-            --logo-games-color: #AAAAAA;
-        }
+        :root { --bg: #1C1C1C; --card: #262626; --txt: #ffffff; --blue: #1E90FF; }
+        body { background-color: var(--bg); color: var(--txt); font-family: 'Inclusive Sans', sans-serif; margin: 0; }
+        
+        header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+        .logo { font-family: 'Source Code Pro', monospace; font-size: 24px; font-weight: bold; }
 
-        [data-theme="light"] {
-            --bg-color: #FFFFF0;
-            --text-color: #1C1C1C;
-            --logo-games-color: #555555;
+        /* Botão Flutuante de Adicionar */
+        .add-btn { 
+            position: fixed; bottom: 30px; right: 30px; 
+            width: 60px; height: 60px; border-radius: 50%; 
+            background: var(--blue); color: white; border: none; 
+            font-size: 30px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center; transition: 0.2s;
         }
+        .add-btn:active { transform: scale(0.9); opacity: 0.7; }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Inclusive Sans', sans-serif;
-            margin: 0;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        header {
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: baseline;
-        }
-
-        .logo-gramdie {
-            font-family: 'Source Code Pro', monospace;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .logo-games {
-            font-size: 16px;
-            margin-left: 5px;
-            color: var(--logo-games-color);
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 15px;
-        }
-
-        /* Regras dos Botões */
-        .btn {
-            font-family: 'Inclusive Sans', sans-serif;
-            color: white;
-            background-color: #1E90FF;
-            border: none;
-            border-radius: 12px;
-            padding: 10px 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 16px;
-            transition: 0.2s ease;
-        }
-
-        /* Efeito de Transparência solicitado: afeta fundo e texto */
-        .btn:active {
-            opacity: 0.5;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .container {
-            padding: 80px 40px;
-            text-align: center;
-        }
+        /* Grid de Jogos */
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 30px; }
+        .game-card { background: var(--card); border-radius: 15px; overflow: hidden; position: relative; }
+        .banner { width: 100%; height: 160px; object-fit: cover; }
+        .info { padding: 15px; }
+        
+        /* Tags de Segurança */
+        .security-tag { position: absolute; top: 10px; left: 10px; padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.7); }
+        .safe { color: #00FF00; }
+        .danger { color: #FF4444; border: 1px solid #FF4444; }
     </style>
 </head>
 <body>
-
     <header>
-        <div class="logo-container">
-            <span class="logo-gramdie">Gramdie</span><span class="logo-games">Games</span>
-        </div>
-
-        <div class="nav-buttons">
-            <button id="theme-toggle" class="btn" title="Mudar Tema">
-                <i id="theme-icon" class="fa-solid fa-sun"></i>
-            </button>
-
-            <button class="btn" onclick="location.href='pages/login.html'">
-                <i class="fa-regular fa-circle-user"></i>
-                Login
-            </button>
-        </div>
+        <div class="logo">Gramdie<span>Games</span></div>
+        <button class="btn-blue" style="padding: 10px 20px; border-radius: 10px; border:none; background:var(--blue); color:white; cursor:pointer;" onclick="location.href='pages/login.html'">Admin</button>
     </header>
 
-    <div class="container">
-        <h1>Bem-vindo à Gramdie Games</h1>
-        <p>Acesse com seu Nickname para gerenciar seus jogos.</p>
+    <div class="games-grid" id="gamesContainer">
+        <div class="game-card">
+            <div class="security-tag safe"><i class="fab fa-google-drive"></i> Google Drive</div>
+            <img src="https://via.placeholder.com/300x160" class="banner">
+            <div class="info">
+                <h3>Título do Jogo</h3>
+                <p style="font-size: 13px; color: #aaa;">Postado por: 847294729</p>
+            </div>
+        </div>
     </div>
 
-    <script>
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        const body = document.body;
+    <button class="add-btn" onclick="location.href='pages/creategame.html'">+</button>
 
-        function setCookie(name, value, days) {
-            const date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
-        }
-
-        function getCookie(name) {
-            const nameEQ = name + "=";
-            const ca = document.cookie.split(';');
-            for(let i=0;i < ca.length;i++) {
-                let c = ca[i];
-                while (c.charAt(0)==' ') c = c.substring(1,c.length);
-                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-            }
-            return null;
-        }
-
-        // Aplicar tema salvo
-        const savedTheme = getCookie("theme") || "dark";
-        if (savedTheme === "light") {
-            body.setAttribute('data-theme', 'light');
-            themeIcon.classList.replace('fa-sun', 'fa-moon');
-        }
-
-        themeToggle.addEventListener('click', () => {
-            const isLight = body.hasAttribute('data-theme');
-            if (isLight) {
-                body.removeAttribute('data-theme');
-                themeIcon.classList.replace('fa-moon', 'fa-sun');
-                setCookie("theme", "dark", 30);
-            } else {
-                body.setAttribute('data-theme', 'light');
-                themeIcon.classList.replace('fa-sun', 'fa-moon');
-                setCookie("theme", "light", 30);
-            }
-        });
-    </script>
 </body>
 </html>
