@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gramdie Games</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&family=Source+Code+Pro:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #1C1C1C;
+            --card: #262626;
+            --txt: #ffffff;
+            --lg: #888888; /* Cinza para o "Games" e descrições */
+            --blue: #1E90FF;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--txt);
+            font-family: 'Inclusive Sans', sans-serif;
+            margin: 0;
+            padding-bottom: 100px;
+        }
+
+        /* Header e Logo Corrigida */
+        header {
+            padding: 30px 50px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: baseline;
+            gap: 12px; /* Espaço entre Gramdie e Games */
+        }
+
+        .logo-gramdie {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .logo-games {
+            font-size: 20px;
+            color: var(--lg);
+            font-weight: normal;
+        }
+
+        /* Grid de Jogos */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            padding: 40px 50px;
+        }
+
+        /* Card Arredondado */
+        .game-card {
+            background: var(--card);
+            border-radius: 24px; /* Bem arredondado */
+            overflow: hidden;
+            border: 1px solid #333;
+            transition: transform 0.2s;
+        }
+
+        .game-card:hover { transform: translateY(-5px); }
+
+        .banner {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: #111;
+        }
+
+        .info { padding: 20px; }
+
+        .info h3 {
+            margin: 0 0 8px 0;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .description {
+            font-size: 14px;
+            color: var(--lg);
+            margin-bottom: 15px;
+            line-height: 1.4;
+            height: 40px; /* Garante alinhamento */
+        }
+
+        /* Container de Tags */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #333;
+        }
+
+        /* Cores das Tags */
+        .tag-os { background: #444; color: #fff; }
+        .tag-cloud { background: rgba(30, 144, 255, 0.15); color: var(--blue); }
+
+        /* Botão de Download */
+        .dl-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: var(--blue);
+            color: white;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .dl-btn:hover { filter: brightness(1.2); }
+
+        /* Botão Flutuante + */
+        .add-btn {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--blue);
+            color: white;
+            border: none;
+            font-size: 35px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            z-index: 1000;
+        }
+        .add-btn:hover { transform: scale(1.1) rotate(90deg); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <span class="logo-gramdie">Gramdie</span>
+            <span class="logo-games">Games</span>
+        </div>
+    </header>
+
+    <div class="games-grid" id="gamesContainer">
+        </div>
+
+    <button class="add-btn" onclick="location.href='pages/creategame.html'">+</button>
+
+    <script>
+        // Configuração do Repositório de Armazenamento
+        const REPO_OWNER = 'Gramdie';
+        const REPO_NAME = 'Gramdie-repository-for-games';
+        const FOLDER_PATH = 'posts';
+
+        // Lógica de Tags de OS (Prioridade 1)
+        function getOSTags(link) {
+            const url = link.toLowerCase();
+            let tags = '';
+            if (url.includes('.exe') || url.includes('.msi')) 
+                tags += `<span class="tag tag-os"><i class="fab fa-windows"></i> Windows</span>`;
+            if (url.includes('.apk')) 
+                tags += `<span class="tag tag-os"><i class="fab fa-android"></i> Android</span>`;
+            if (url.includes('.tar.gz')) 
+                tags += `<span class="tag tag-os"><i class="fab fa-linux"></i> Linux</span>`;
+            if (url.includes('.osx') || url.includes('.pef') || url.includes('.dmg')) 
+                tags += `<span class="tag tag-os"><i class="fab fa-apple"></i> MacOS</span>`;
+            return tags;
+        }
+
+        // Lógica de Tags de Cloud (Prioridade 2)
+        function getCloudTags(link) {
+            const url = link.toLowerCase();
+            const services = [
+                { name: 'Google Drive', icon: 'fab fa-google-drive', match: 'drive.google.com' },
+                { name: 'MEGA', icon: 'fas fa-cloud', match: 'mega.nz' },
+                { name: 'Mediafire', icon: 'fas fa-download', match: 'mediafire.com' },
+                { name: 'OneDrive', icon: 'fab fa-microsoft', match: '1drv.ms' },
+                { name: 'Terabox', icon: 'fas fa-box-open', match: 'terabox.com' },
+                { name: 'Box', icon: 'fas fa-box', match: 'box.com' },
+                { name: 'pCloud', icon: 'fas fa-cloud-download-alt', match: 'pcloud.com' },
+                { name: 'iDrive', icon: 'fas fa-hdd', match: 'idrive.com' }
+            ];
+
+            const found = services.find(s => url.includes(s.match));
+            if (found) {
+                return `<span class="tag tag-cloud"><i class="${found.icon}"></i> ${found.name}</span>`;
+            }
+            return `<span class="tag"><i class="fas fa-link"></i> Link Externo</span>`;
+        }
+
+        // Carregar Posts do GitHub
+        async function fetchPosts() {
+            const container = document.getElementById('gamesContainer');
+            try {
+                const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FOLDER_PATH}`);
+                const files = await response.json();
+
+                // Limpa o container antes de carregar
+                container.innerHTML = '';
+
+                for (const file of files) {
+                    if (file.name.endsWith('.json')) {
+                        const rawData = await fetch(file.download_url);
+                        const game = await rawData.json();
+
+                        // Lógica da Descrição (Máx 90 caracteres)
+                        const shortDesc = game.description.length > 90 
+                            ? game.description.substring(0, 90) + "..." 
+                            : game.description;
+
+                        const card = `
+                            <div class="game-card">
+                                <img src="${game.banner}" class="banner" onerror="this.src='https://via.placeholder.com/400x200/111/444?text=Sem+Imagem'">
+                                <div class="info">
+                                    <h3>${game.title}</h3>
+                                    <p class="description">${shortDesc}</p>
+                                    <div class="tags-container">
+                                        ${getOSTags(game.mainLink)}
+                                        ${getCloudTags(game.mainLink)}
+                                    </div>
+                                    <a href="${game.mainLink}" target="_blank" class="dl-btn">
+                                        <i class="fas fa-download"></i> Baixar Agora
+                                    </a>
+                                    <p style="font-size: 10px; color: #555; margin-top: 15px;">Autor: ${game.author || 'Anônimo'}</p>
+                                </div>
+                            </div>
+                        `;
+                        container.innerHTML += card;
+                    }
+                }
+            } catch (err) {
+                console.error("Erro ao buscar posts:", err);
+                container.innerHTML = `<p style="color:red">Erro ao conectar com a nuvem de jogos.</p>`;
+            }
+        }
+
+        window.onload = fetchPosts;
+    </script>
+</body>
+</html>
