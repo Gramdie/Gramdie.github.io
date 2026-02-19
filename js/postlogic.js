@@ -1,6 +1,6 @@
 // 1. CONFIGURAÇÕES DAS APIS
 const SHEETDB_URL = "https://sheetdb.io/api/v1/9sv7pjhrhpwbq";
-const VT_API_KEY = "SUA_API_KEY_AQUI"; // Insira sua chave da Public API do VirusTotal
+const VT_API_KEY = "c3cd4cfd74850d6a5938aa2a65fa307267804a7dc749084ee1a1c6ced16d58c0"; // Insira sua chave da Public API do VirusTotal
 
 // Elementos do DOM
 const loadingScreen = document.getElementById('loading');
