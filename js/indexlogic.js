@@ -1,81 +1,70 @@
-// 1. CONFIGURAÇÃO DA API
-// Substitua pelo link que você gerou no SheetDB
-const SHEETDB_URL = "https://sheetdb.io/api/v1/9sv7pjhrhpwbq"; 
+// Substitua pelo seu link do SheetDB
+const SHEETDB_URL = "https://sheetdb.io/api/v1/SUA_ID_AQUI"; 
 
-const gamesContainer = document.getElementById('gamesContainer');
+// O ID correto conforme o seu HTML é 'games-grid'
+const gamesGrid = document.getElementById('games-grid');
+const loadingTrigger = document.getElementById('loading-trigger');
 
-/**
- * Função principal para buscar os jogos na Planilha Google via SheetDB
- */
 async function buscarJogos() {
+    if (!gamesGrid) return;
+
     try {
         console.log("Conectando ao SheetDB...");
-        
-        // Faz a chamada para a API
         const response = await fetch(SHEETDB_URL);
         
-        if (!response.ok) throw new Error("Não foi possível conectar à base de dados.");
+        if (!response.ok) throw new Error("Erro ao conectar à API");
 
         const jogos = await response.json();
 
-        // Limpa o container (remove o texto "Carregando...")
-        gamesContainer.innerHTML = '';
+        // Limpa a grade antes de mostrar os resultados
+        gamesGrid.innerHTML = '';
+        if (loadingTrigger) loadingTrigger.style.display = 'none';
 
         if (jogos.length === 0) {
-            gamesContainer.innerHTML = `
-                <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
-                    <p style="color: #888;">Nenhum jogo postado no repositório ainda.</p>
-                </div>`;
+            gamesGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Nenhum jogo encontrado.</p>';
             return;
         }
 
-        // 2. RENDERIZAÇÃO DOS CARDS
-        // .reverse() serve para que o jogo mais recente (última linha da planilha) apareça primeiro
+        // Renderiza os jogos (mais recentes primeiro)
         jogos.reverse().forEach(jogo => {
+            // Cria o elemento do card
             const card = document.createElement('div');
             card.className = 'game-card';
             
-            // Configura o clique para ir à página do post com o ID da planilha
+            // Configura o clique para a página do post
             card.onclick = () => {
                 window.location.href = `pages/post.html?id=${jogo.id}`;
             };
 
-            // Monta a estrutura visual do card usando os nomes das colunas que você criou
+            // Monta o HTML interno seguindo exatamente o seu estilo CSS
             card.innerHTML = `
-                <div class="banner-wrapper">
-                    <img src="${jogo.banner}" alt="${jogo.title}" class="game-banner" onerror="this.src='https://placehold.co/600x400?text=Sem+Imagem'">
-                </div>
-                <div class="game-details">
-                    <h3 class="game-title">${jogo.title}</h3>
-                    <p class="game-genres">
-                        <i class="fas fa-tags" style="font-size: 10px; color: #1e90ff;"></i> 
-                        ${jogo.genres}
-                    </p>
-                    <div class="game-footer">
-                        <span class="game-date">${jogo.date || 'Recém postado'}</span>
+                <img src="${jogo.banner}" alt="${jogo.title}">
+                <div class="card-content">
+                    <span class="post-date">${jogo.date || 'Recém postado'}</span>
+                    <h3 style="margin: 0; font-size: 18px;">${jogo.title}</h3>
+                    <p class="card-desc">${jogo.description || ''}</p>
+                    <div class="genre-tags">
+                        ${jogo.genres ? jogo.genres.split(',').map(g => `<span class="tag-genre">${g.trim()}</span>`).join('') : ''}
                     </div>
+                    <div class="provider-tags">
+                        <span class="tag-provider">Disponível Agora</span>
+                    </div>
+                    <a href="#" class="btn-download">Ver Detalhes</a>
                 </div>
             `;
             
-            gamesContainer.appendChild(card);
+            gamesGrid.appendChild(card);
         });
 
     } catch (err) {
-        console.error("Erro na lógica do index:", err);
-        
-        // Feedback visual de erro para o usuário
-        gamesContainer.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 40px; border: 1px dashed #444; border-radius: 10px;">
-                <i class="fas fa-exclamation-triangle" style="color: #ff4444; font-size: 30px; margin-bottom: 10px;"></i>
-                <p>Erro ao carregar repositório.</p>
-                <p style="font-size: 12px; color: #888;">Verifique se o seu DNS ou navegador está bloqueando a API.</p>
-                <button onclick="location.reload()" style="margin-top: 15px; padding: 8px 20px; background: #1e90ff; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                    Tentar Novamente
-                </button>
-            </div>
-        `;
+        console.error("Erro ao carregar:", err);
+        if (gamesGrid) {
+            gamesGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #ff4444;">
+                Erro ao carregar repositório. Verifique sua conexão.
+            </p>`;
+        }
     }
 }
 
-// Inicializa a função ao carregar a página
+// Inicia a busca
 document.addEventListener('DOMContentLoaded', buscarJogos);
