@@ -1,41 +1,43 @@
-// js/postlogic.js
-const SHEETDB_URL = "https://sheetdb.io/api/v1/9sv7pjhrhpwbq";
+// js/security.js
 
-// Declarar como global (sem const ou let dentro da função)
-window.linkDownloadAtual = ""; 
+window.abrirVerificacaoVT = () => {
+    // Busca a variável global definida no outro arquivo
+    const link = window.linkDownloadAtual;
 
-async function carregarPost() {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
+    if (!link || link === "") {
+        console.log("Aguardando carregamento do link de download");
+        return;
+    }
 
-    if (!id) return;
-
-    try {
-        const res = await fetch(`${SHEETDB_URL}/search?id=${id}`);
-        const data = await res.json();
-        const jogo = data[0];
-
-        if (jogo) {
-            window.linkDownloadAtual = jogo.mainLink; // Atribui ao global
-
-            document.getElementById('gameTitle').innerText = jogo.title;
-            document.getElementById('gameBanner').src = jogo.banner;
-            document.getElementById('gameDesc').innerText = jogo.description;
-            document.getElementById('postDate').innerText = jogo.date;
-            document.getElementById('gameLink').href = window.linkDownloadAtual;
-
-            const genreContainer = document.getElementById('gameGenres');
-            if (jogo.genres) {
-                genreContainer.innerHTML = jogo.genres.split(',')
-                    .map(g => `<span class="genre-tag">${g.trim()}</span>`).join('');
-            }
-
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('content').style.display = 'block';
+    // Copia para a área de transferência
+    navigator.clipboard.writeText(link).then(() => {
+        const ocultar = localStorage.getItem('pularAvisoVT');
+        
+        if (ocultar === 'true') {
+            window.open('https://www.virustotal.com/gui/home/url', '_blank');
+        } else {
+            const modal = document.getElementById('vtModal');
+            if (modal) modal.style.display = 'flex';
         }
-    } catch (e) {
-        console.log("Erro ao carregar post");
+    });
+};
+
+window.fecharVTModal = () => {
+    salvarEscolha();
+    const modal = document.getElementById('vtModal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.irParaVT = () => {
+    salvarEscolha();
+    window.open('https://www.virustotal.com/gui/home/url', '_blank');
+    const modal = document.getElementById('vtModal');
+    if (modal) modal.style.display = 'none';
+};
+
+function salvarEscolha() {
+    const check = document.getElementById('dontShowVT');
+    if (check && check.checked) {
+        localStorage.setItem('pularAvisoVT', 'true');
     }
 }
-
-document.addEventListener('DOMContentLoaded', carregarPost);
