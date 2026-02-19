@@ -1,6 +1,6 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-// 1. CONFIGURAÇÃO (Verifique se sua URL e Chave estão corretas)
+// Verifique se não há espaços antes ou depois da URL
 const SUPABASE_URL = 'https://vhybulaqcdunktgwxqbzn.supabase.co'; 
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoeWJ1bGFxY2R1a3Rnd3hxYnpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NDQyOTgsImV4cCI6MjA4NzAyMDI5OH0.5obZrq54mSh1R3JzJ_lKokVVw4Yp2oostUMQLXzzR0s'; 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -12,16 +12,14 @@ if (form) {
     form.onsubmit = async (e) => {
         e.preventDefault();
         
-        // Bloqueia o botão para evitar múltiplos envios
+        // Desativa o botão para evitar envios duplicados
         submitBtn.disabled = true;
-        submitBtn.innerText = "Publicando no Servidor...";
+        submitBtn.innerText = "Conectando ao servidor...";
 
-        // Coleta todos os gêneros marcados nos checkboxes
         const selectedGenres = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
             .map(cb => cb.value)
             .join(', ');
 
-        // Organiza os dados para o banco
         const gameData = {
             title: document.getElementById('title').value,
             banner: document.getElementById('banner').value,
@@ -31,35 +29,32 @@ if (form) {
         };
 
         try {
-            // Envia para a tabela 'posts'
+            // Tentativa de inserção com timeout manual se necessário
             const { data, error } = await supabase
                 .from('posts')
                 .insert([gameData])
-                .select(); // O select() retorna os dados do post criado, incluindo o ID
+                .select();
 
             if (error) throw error;
 
-            // --- LÓGICA DE NOTIFICAÇÃO E REDIRECIONAMENTO ---
+            // Sucesso! Notifica o usuário
             const novoPostId = data[0].id;
+            const mensagem = "Jogo publicado com sucesso!\n\nOK: Ver a página do jogo\nCANCELAR: Voltar para o início";
             
-            // Notifica que terminou
-            const irParaPost = confirm("Publicação concluída com sucesso!\n\nClique em OK para ver a página do jogo ou CANCELAR para voltar à tela inicial.");
-
-            if (irParaPost) {
-                // Direciona para a página do post/jogo
+            if (confirm(mensagem)) {
+                // Direciona para a página do post (ajuste o caminho se necessário)
                 window.location.href = `post.html?id=${novoPostId}`;
             } else {
-                // Direciona para a tela inicial
                 window.location.href = '../index.html';
             }
 
-        } catch (error) {
-            alert("Erro ao enviar para o servidor: " + error.message);
-            console.error("Erro detalhado:", error);
+        } catch (err) {
+            // Tratamento específico para o erro de rede da imagem
+            console.error("Erro de conexão:", err);
+            alert("Erro de Rede: Não foi possível alcançar o servidor. Verifique se o seu antivírus está bloqueando o Supabase ou se a URL está correta.");
             
-            // Reativa o botão em caso de erro
             submitBtn.disabled = false;
-            submitBtn.innerText = "Publicar Jogo";
+            submitBtn.innerText = "Tentar Publicar Novamente";
         }
     };
 }
