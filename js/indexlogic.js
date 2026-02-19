@@ -1,198 +1,136 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gramdie Games</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #121212;
-            --header-border: #2a2a2a; /* Barra divisória levemente mais clara */
-            --card-bg: #1e1e1e;
-            --text-main: #ffffff;
-            --text-gray: #888888;
-            --blue: #1e90ff;
-            --search-bg: #1e1e1e;
-        }
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-        body.light-mode {
-            --bg: #ffffff;
-            --header-border: #eeeeee;
-            --card-bg: #f9f9f9;
-            --text-main: #121212;
-            --text-gray: #666666;
-            --blue: #007bff;
-            --search-bg: #f0f0f0;
-        }
+const SUPABASE_URL = 'SUA_URL_DO_SUPABASE';
+const SUPABASE_KEY = 'SUA_CHAVE_ANON_PUBLIC';
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: 'Inclusive Sans', sans-serif;
-            margin: 0;
-            transition: 0.3s;
-        }
+let pagina = 0;
+const limite = 50;
+let carregando = false;
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 5%;
-            border-bottom: 1px solid var(--header-border);
-            position: sticky;
-            top: 0;
-            background: var(--bg);
-            z-index: 1000;
-        }
+// --- FUNÇÕES DE COOKIE ---
+function setCookie(name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
+}
 
-        .logo-area { display: flex; align-items: baseline; cursor: pointer; }
-        .logo-area h1 { font-size: 24px; margin: 0; }
-        .logo-area span { color: var(--text-gray); font-size: 16px; margin-left: 8px; }
+function getCookie(name) {
+    const v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+    return v ? v[2] : null;
+}
 
-        /* Pesquisa Central */
-        .search-container {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 380px;
-        }
+// --- CONTROLE DE TEMA (COM PERSISTÊNCIA) ---
+const themeBtn = document.getElementById('themeBtn');
+const themeIcon = document.getElementById('themeIcon');
 
-        .search-box {
-            display: flex;
-            align-items: center;
-            background: var(--search-bg);
-            padding: 8px 15px;
-            border-radius: 20px;
-            border: 1px solid var(--header-border);
-        }
+function aplicarTema(tema) {
+    if (tema === 'light') {
+        document.body.classList.add('light-mode');
+        themeIcon.className = 'fas fa-moon';
+    } else {
+        document.body.classList.remove('light-mode');
+        themeIcon.className = 'fas fa-sun';
+    }
+}
 
-        .search-box input {
-            background: none;
-            border: none;
-            color: var(--text-main);
-            margin-left: 10px;
-            outline: none;
-            width: 100%;
-        }
+// Carregar preferência salva
+const temaSalvo = getCookie('user-theme') || 'dark';
+aplicarTema(temaSalvo);
 
-        .search-results {
-            position: absolute;
-            background: var(--card-bg);
-            width: 100%;
-            border-radius: 12px;
-            margin-top: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: none;
-            max-height: 520px;
-            overflow: hidden;
-            border: 1px solid var(--header-border);
-        }
+themeBtn.onclick = () => {
+    const novoTema = document.body.classList.contains('light-mode') ? 'dark' : 'light';
+    aplicarTema(novoTema);
+    setCookie('user-theme', novoTema, 365);
+};
 
-        .result-item {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            cursor: pointer;
-        }
+// --- NAVEGAÇÃO ---
+document.getElementById('addGameBtn').onclick = () => window.location.href = 'pages/creategame.html';
 
-        .result-item:hover { background: var(--header-border); }
-        .result-item img { width: 35px; height: 35px; border-radius: 5px; margin-right: 12px; object-fit: cover; }
+// --- CARREGAMENTO DE JOGOS ---
+async function carregarJogos() {
+    if (carregando) return;
+    carregando = true;
 
-        /* Botões de Ação */
-        .nav-actions { display: flex; gap: 10px; }
+    // Busca sem exigir created_at para evitar erro 42703
+    const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .range(pagina * limite, (pagina + 1) * limite - 1);
 
-        .btn-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: none;
-            background: var(--blue);
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-        }
+    if (error) {
+        console.error("Erro Supabase:", error.message);
+        return;
+    }
 
-        .btn-circle:hover { transform: scale(1.1); }
+    if (data && data.length > 0) {
+        renderizarCards(data);
+        if (pagina === 0) setRandomPlaceholder(data);
+        pagina++;
+    }
+    carregando = false;
+}
 
-        /* Grade de Jogos */
-        #games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            padding: 40px 5%;
-        }
+function renderizarCards(jogos) {
+    const grid = document.getElementById('games-grid');
+    jogos.forEach(game => {
+        const desc = game.description || "";
+        const descExibida = desc.length > 90 ? desc.substring(0, 90) + "..." : desc;
+        const tagsHtml = gerarTags(game.mainLink);
 
-        .game-card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            overflow: hidden;
-            transition: 0.3s;
-            border: 1px solid transparent;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .game-card:hover { border-color: #888888; } /* Borda cinza fina no hover */
-
-        .game-card img { width: 100%; height: 165px; object-fit: cover; }
-        .card-content { padding: 18px; flex-grow: 1; display: flex; flex-direction: column; }
-        .card-desc { font-size: 14px; color: var(--text-gray); margin: 12px 0; min-height: 42px; }
-
-        .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 15px; }
-        .tag { font-size: 10px; padding: 2px 8px; border-radius: 4px; background: #2a2a2a; color: var(--blue); font-weight: bold; text-transform: uppercase; }
-
-        /* Botão Download Centralizado */
-        .btn-download {
-            background: var(--blue);
-            color: white;
-            padding: 12px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: bold;
-            text-align: center;
-            width: 100%;
-            box-sizing: border-box; /* Garante que o padding não "empurre" o botão para fora */
-            display: block;
-            margin-top: auto;
-        }
-
-        #loading-trigger { height: 80px; display: flex; align-items: center; justify-content: center; color: var(--text-gray); }
-    </style>
-</head>
-<body>
-
-    <header>
-        <div class="logo-area" onclick="window.location.reload()">
-            <h1>Gramdie</h1><span>Games</span>
-        </div>
-
-        <div class="search-container">
-            <div class="search-box">
-                <i class="fas fa-search" style="color: var(--text-gray);" id="btnSearch"></i>
-                <input type="text" id="searchInput" placeholder="Buscando...">
+        const card = document.createElement('div');
+        card.className = 'game-card';
+        card.onclick = () => window.location.href = `pages/post.html?id=${game.id}`;
+        
+        card.innerHTML = `
+            <img src="${game.banner || 'img/placeholder.jpg'}" alt="${game.title}">
+            <div class="card-content">
+                <h3 style="margin:0">${game.title}</h3>
+                <p class="card-desc">${descExibida}</p>
+                <div class="tags">${tagsHtml}</div>
+                <a href="${game.mainLink}" target="_blank" class="btn-download" onclick="event.stopPropagation()">Download</a>
             </div>
-            <div id="searchResults" class="search-results"></div>
-        </div>
+        `;
+        grid.appendChild(card);
+    });
+}
 
-        <div class="nav-actions">
-            <button class="btn-circle" id="addGameBtn" title="Criar Jogo">
-                <i class="fas fa-plus"></i>
-            </button>
-            <button class="btn-circle" id="themeBtn">
-                <i class="fas fa-sun" id="themeIcon"></i>
-            </button>
-        </div>
-    </header>
+function gerarTags(link) {
+    const hosts = ['mediafire', 'google', 'mega', 'pcloud', 'box', 'icloud'];
+    return hosts.filter(h => link.toLowerCase().includes(h))
+                .map(h => `<span class="tag">${h}</span>`).join('');
+}
 
-    <div id="games-grid"></div>
-    <div id="loading-trigger">Carregando mais jogos...</div>
+// --- BUSCA DINÂMICA (MAX 12) ---
+const searchInput = document.getElementById('searchInput');
+const resultsBox = document.getElementById('searchResults');
 
-    <script type="module" src="js/indexlogic.js"></script>
-</body>
-</html>
+searchInput.oninput = async () => {
+    const termo = searchInput.value.toLowerCase();
+    if (termo.length < 2) { resultsBox.style.display = 'none'; return; }
+
+    const { data } = await supabase.from('posts').select('id, title, banner').ilike('title', `%${termo}%`).limit(12);
+
+    if (data && data.length > 0) {
+        resultsBox.innerHTML = data.map(j => `
+            <div class="result-item" onclick="window.location.href='pages/post.html?id=${j.id}'">
+                <img src="${j.banner}">
+                <span>${j.title}</span>
+            </div>
+        `).join('');
+        resultsBox.style.display = 'block';
+    }
+};
+
+function setRandomPlaceholder(jogos) {
+    const r = jogos[Math.floor(Math.random() * jogos.length)];
+    if (r) searchInput.placeholder = `Ex: ${r.title}`;
+}
+
+// Scroll Infinito
+const observer = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) carregarJogos();
+});
+observer.observe(document.getElementById('loading-trigger'));
+
+carregarJogos();
