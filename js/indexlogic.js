@@ -1,5 +1,5 @@
 // Substitua pelo seu link do SheetDB
-const SHEETDB_URL = "https://sheetdb.io/api/v1/SUA_ID_AQUI"; 
+const SHEETDB_URL = "https://sheetdb.io/api/v1/9sv7pjhrhpwbq"; 
 
 // O ID correto conforme o seu HTML é 'games-grid'
 const gamesGrid = document.getElementById('games-grid');
