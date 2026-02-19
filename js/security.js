@@ -1,43 +1,45 @@
 // js/security.js
 
 window.abrirVerificacaoVT = () => {
-    // Busca a variável global definida no outro arquivo
-    const link = window.linkDownloadAtual;
+    // Tenta pegar o link da variável global
+    const linkParaCopiar = window.linkDownloadAtual;
 
-    if (!link || link === "") {
-        console.log("Aguardando carregamento do link de download");
+    if (!linkParaCopiar || linkParaCopiar === "") {
+        alert("O link ainda está sendo carregado, por favor aguarde um instante");
         return;
     }
 
-    // Copia para a área de transferência
-    navigator.clipboard.writeText(link).then(() => {
-        const ocultar = localStorage.getItem('pularAvisoVT');
-        
-        if (ocultar === 'true') {
+    // Processo de cópia
+    navigator.clipboard.writeText(linkParaCopiar).then(() => {
+        const devePular = localStorage.getItem('pularConfirmacaoVT');
+
+        if (devePular === 'true') {
             window.open('https://www.virustotal.com/gui/home/url', '_blank');
         } else {
             const modal = document.getElementById('vtModal');
-            if (modal) modal.style.display = 'flex';
+            if (modal) {
+                modal.style.display = 'flex';
+            }
         }
+    }).catch(err => {
+        console.log("Falha ao copiar o link");
     });
 };
 
 window.fecharVTModal = () => {
-    salvarEscolha();
-    const modal = document.getElementById('vtModal');
-    if (modal) modal.style.display = 'none';
+    salvarEscolhaPrivacidade();
+    document.getElementById('vtModal').style.display = 'none';
 };
 
 window.irParaVT = () => {
-    salvarEscolha();
+    salvarEscolhaPrivacidade();
     window.open('https://www.virustotal.com/gui/home/url', '_blank');
-    const modal = document.getElementById('vtModal');
-    if (modal) modal.style.display = 'none';
+    document.getElementById('vtModal').style.display = 'none';
 };
 
-function salvarEscolha() {
-    const check = document.getElementById('dontShowVT');
-    if (check && check.checked) {
-        localStorage.setItem('pularAvisoVT', 'true');
+function salvarEscolhaPrivacidade() {
+    const checkbox = document.getElementById('dontShowVT');
+    if (checkbox && checkbox.checked) {
+        localStorage.setItem('pularConfirmacaoVT', 'true');
     }
 }
