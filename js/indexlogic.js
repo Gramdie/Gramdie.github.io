@@ -2,7 +2,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 // IMPORTANTE: Use a URL exatamente como aparece no seu painel
 const SUPABASE_URL = 'https://vhybulaqcdunktgwxqbzn.supabase.co'; 
-const SUPABASE_KEY = 'SUA_ANON_KEY_AQUI'; // Coloque sua chave real aqui
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoeWJ1bGFxY2R1a3Rnd3hxYnpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NDQyOTgsImV4cCI6MjA4NzAyMDI5OH0.5obZrq54mSh1R3JzJ_lKokVVw4Yp2oostUMQLXzzR0s'; // Coloque sua chave real aqui
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let pagina = 0;
