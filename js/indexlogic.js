@@ -1,6 +1,6 @@
 // 1. CONFIGURAÇÃO DA API
 // Substitua pelo link que você gerou no SheetDB
-const SHEETDB_URL = "https://sheetdb.io/api/v1/SUA_ID_AQUI"; 
+const SHEETDB_URL = "https://sheetdb.io/api/v1/9sv7pjhrhpwbq"; 
 
 const gamesContainer = document.getElementById('gamesContainer');
 
