@@ -1,68 +1,41 @@
-// js/security.js
+// js/postlogic.js
+const SHEETDB_URL = "https://sheetdb.io/api/v1/9sv7pjhrhpwbq";
 
-// Função para abrir a verificação do VirusTotal
-window.abrirVerificacaoVT = () => {
-    const linkParaCopiar = linkDownloadAtual;
+// Declarar como global (sem const ou let dentro da função)
+window.linkDownloadAtual = ""; 
 
-    if (!linkParaCopiar) {
-        console.log("Erro: link de download não encontrado para copiar");
-        return;
-    }
+async function carregarPost() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
 
-    // Copia o link para a área de transferência
-    navigator.clipboard.writeText(linkParaCopiar).then(() => {
-        console.log("Link copiado com sucesso");
-        
-        // Verifica se o utilizador marcou para não mostrar o modal
-        const esconderAviso = localStorage.getItem('gramdie_hide_vt_modal');
+    if (!id) return;
 
-        if (esconderAviso === 'true') {
-            direcionarParaVT();
-        } else {
-            exibirModalVT();
+    try {
+        const res = await fetch(`${SHEETDB_URL}/search?id=${id}`);
+        const data = await res.json();
+        const jogo = data[0];
+
+        if (jogo) {
+            window.linkDownloadAtual = jogo.mainLink; // Atribui ao global
+
+            document.getElementById('gameTitle').innerText = jogo.title;
+            document.getElementById('gameBanner').src = jogo.banner;
+            document.getElementById('gameDesc').innerText = jogo.description;
+            document.getElementById('postDate').innerText = jogo.date;
+            document.getElementById('gameLink').href = window.linkDownloadAtual;
+
+            const genreContainer = document.getElementById('gameGenres');
+            if (jogo.genres) {
+                genreContainer.innerHTML = jogo.genres.split(',')
+                    .map(g => `<span class="genre-tag">${g.trim()}</span>`).join('');
+            }
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
         }
-    }).catch(err => {
-        console.log("Erro ao copiar link");
-    });
-};
-
-// Exibe o modal na tela
-function exibirModalVT() {
-    const modal = document.getElementById('vtModal');
-    if (modal) {
-        modal.style.display = 'flex';
+    } catch (e) {
+        console.log("Erro ao carregar post");
     }
 }
 
-// Fecha o modal e salva preferência se necessário
-window.fecharVTModal = () => {
-    salvarPreferenciaUtilizador();
-    const modal = document.getElementById('vtModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-};
-
-// Abre o site do VirusTotal e fecha o modal
-window.irParaVT = () => {
-    salvarPreferenciaUtilizador();
-    direcionarParaVT();
-    const modal = document.getElementById('vtModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-};
-
-// Redireciona para a página de URL do VirusTotal
-function direcionarParaVT() {
-    window.open('https://www.virustotal.com/gui/home/url', '_blank');
-}
-
-// Guarda no navegador se o utilizador não quer mais ver o popup
-function salvarPreferenciaUtilizador() {
-    const checkbox = document.getElementById('dontShowVT');
-    if (checkbox && checkbox.checked) {
-        localStorage.setItem('gramdie_hide_vt_modal', 'true');
-        console.log("Preferência de ocultar modal guardada");
-    }
-}
+document.addEventListener('DOMContentLoaded', carregarPost);
