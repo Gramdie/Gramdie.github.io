@@ -1,109 +1,82 @@
 const SHEETDB_URL = "https://sheetdb.io/api/v1/9sv7pjhrhpwbq";
 
-// Elementos do DOM
+// Elementos do DOM conforme o seu post.html
 const loadingScreen = document.getElementById('loading');
 const contentContainer = document.getElementById('content');
 const gameLinkBtn = document.getElementById('gameLink');
-const securityLabel = document.getElementById('securityLabel');
 const availabilityLabel = document.getElementById('availabilityLabel');
 
 let linkFinal = "";
-let nivelDePerigo = "Não Perigoso";
-
-// Configurações de cores e mensagens por nível
-const CONFIG_SEGURANCA = {
-    "Não Perigoso": { cor: "#2ecc71", msg: "Este link foi verificado pela nossa equipa." },
-    "Potencialmente Perigoso": { cor: "#f1c40f", msg: "Atenção: Este ficheiro pode conter scripts não verificados." },
-    "Perigoso": { cor: "#e67e22", msg: "Cuidado: Este link possui alertas de comportamento suspeito." },
-    "Bem Perigoso": { cor: "#e74c3c", msg: "ALERTA CRÍTICO: Malware detetado. O acesso não é recomendado." }
-};
 
 async function carregarPost() {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
 
-    if (!id) return window.location.href = '../index.html';
+    // Se não houver ID, volta para a home
+    if (!id) {
+        window.location.href = '../index.html';
+        return;
+    }
 
     try {
         const response = await fetch(`${SHEETDB_URL}/search?id=${id}`);
         const data = await response.json();
         
-        if (!data || data.length === 0) return;
+        if (!data || data.length === 0) {
+            console.log("Jogo não encontrado no banco de dados");
+            return;
+        }
 
         const jogo = data[0];
         linkFinal = jogo.mainLink;
-        nivelDePerigo = jogo.danger || "Não Perigoso";
 
-        // Preencher dados no HTML
+        // Preencher os dados básicos
         document.getElementById('gameTitle').innerText = jogo.title;
         document.getElementById('gameBanner').src = jogo.banner;
         document.getElementById('gameDesc').innerText = jogo.description;
-        document.getElementById('postDate').innerText = jogo.date;
+        document.getElementById('postDate').innerText = jogo.date || "Recente";
 
-        // Renderizar Gêneros
-        if (jogo.genres && document.getElementById('gameGenres')) {
-            document.getElementById('gameGenres').innerHTML = jogo.genres.split(',')
-                .map(g => `<span class="genre-tag">${g.trim()}</span>`).join('');
+        // Renderizar Gêneros como tags
+        const genreContainer = document.getElementById('gameGenres');
+        if (jogo.genres && genreContainer) {
+            genreContainer.innerHTML = jogo.genres.split(',')
+                .map(g => `<span class="genre-tag">${g.trim()}</span>`)
+                .join('');
         }
 
-        // Aplicar Status de Segurança Visual
-        const config = CONFIG_SEGURANCA[nivelDePerigo] || CONFIG_SEGURANCA["Não Perigoso"];
-        if (securityLabel) {
-            securityLabel.innerText = nivelDePerigo;
-            securityLabel.style.color = config.cor;
-        }
-
-        // Verificar o Provedor Cloud
-        verificarCloud(linkFinal);
-
-        // Configurar o clique do botão com proteção
+        // Configurar o link de download direto
         if (gameLinkBtn) {
-            gameLinkBtn.onclick = (e) => {
-                e.preventDefault();
-                validarAcesso();
-            };
+            gameLinkBtn.href = linkFinal;
+            gameLinkBtn.target = "_blank";
         }
 
-        // Finalizar carregamento
+        // Verificar qual é o serviço de cloud
+        atualizarStatusCloud(linkFinal);
+
+        // Finalizar a exibição
         if (loadingScreen) loadingScreen.style.display = 'none';
         if (contentContainer) contentContainer.style.display = 'block';
 
     } catch (err) {
-        console.log("Erro ao carregar dados do servidor");
+        console.log("Erro ao ligar ao servidor de dados");
     }
 }
 
-function verificarCloud(url) {
+/**
+ * Identifica o provedor e atualiza o texto de status
+ */
+function atualizarStatusCloud(url) {
     if (!availabilityLabel) return;
-    let provedor = "Cloud Service";
+    
+    let provedor = "Serviço Cloud";
     if (url.includes("mediafire")) provedor = "Mediafire";
-    if (url.includes("mega.nz")) provedor = "Mega.nz";
-    if (url.includes("drive.google")) provedor = "Google Drive";
+    else if (url.includes("mega.nz")) provedor = "Mega.nz";
+    else if (url.includes("drive.google")) provedor = "Google Drive";
+    else if (url.includes("dropbox")) provedor = "Dropbox";
 
     availabilityLabel.innerText = `${provedor}: Disponível`;
     availabilityLabel.style.color = "#2ecc71";
 }
 
-function validarAcesso() {
-    if (nivelDePerigo !== "Não Perigoso") {
-        const modal = document.getElementById('securityModal');
-        const msg = document.getElementById('modalMsg');
-        if (msg) msg.innerText = CONFIG_SEGURANCA[nivelDePerigo].msg;
-        if (modal) modal.style.display = 'flex';
-    } else {
-        window.open(linkFinal, '_blank');
-    }
-}
-
-// Funções globais do Modal
-window.confirmarAcesso = () => {
-    window.open(linkFinal, '_blank');
-    fecharModal();
-};
-
-window.fecharModal = () => {
-    const modal = document.getElementById('securityModal');
-    if (modal) modal.style.display = 'none';
-};
-
+// Inicia o processo ao carregar a página
 document.addEventListener('DOMContentLoaded', carregarPost);
