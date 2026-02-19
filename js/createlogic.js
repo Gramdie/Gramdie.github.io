@@ -1,8 +1,6 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-
-const SUPABASE_URL = 'https://vhybulaqcdunktgwxqbzn.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoeWJ1bGFxY2R1a3Rnd3hxYnpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NDQyOTgsImV4cCI6MjA4NzAyMDI5OH0.5obZrq54mSh1R3JzJ_lKokVVw4Yp2oostUMQLXzzR0s';
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+// 1. CONFIGURAÇÃO DA API
+// Substitua pelo link que você gerou no SheetDB.io
+const SHEETDB_URL = "https://sheetdb.io/api/v1/9sv7pjhrhpwbq"; 
 
 const form = document.getElementById('createGameForm');
 const submitBtn = document.getElementById('submitBtn');
@@ -10,49 +8,64 @@ const submitBtn = document.getElementById('submitBtn');
 if (form) {
     form.onsubmit = async (e) => {
         e.preventDefault();
+        
+        // Desativa o botão para evitar cliques duplos durante o envio
         submitBtn.disabled = true;
-        submitBtn.innerText = "Publicando no Servidor...";
+        submitBtn.innerText = "Enviando para o Servidor...";
 
+        // Gera um ID único baseado no timestamp atual (Ex: 1740000000000)
+        const uniqueId = Date.now().toString();
+
+        // Coleta os gêneros selecionados no formulário
         const selectedGenres = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
             .map(cb => cb.value)
             .join(', ');
 
+        // Prepara o objeto seguindo EXATAMENTE as colunas da sua planilha
         const gameData = {
-            title: document.getElementById('title').value,
-            banner: document.getElementById('banner').value,
-            description: document.getElementById('description').value,
-            genres: selectedGenres,
-            mainLink: document.getElementById('mainLink').value
+            data: [{
+                id: uniqueId,
+                title: document.getElementById('title').value,
+                banner: document.getElementById('banner').value,
+                description: document.getElementById('description').value,
+                genres: selectedGenres,
+                mainLink: document.getElementById('mainLink').value,
+                date: new Date().toLocaleDateString('pt-BR') // Formato: DD/MM/AAAA
+            }]
         };
 
         try {
-            const { data, error } = await supabase
-                .from('posts')
-                .insert([gameData])
-                .select();
+            // Realiza a postagem para a Planilha Google via API
+            const response = await fetch(SHEETDB_URL, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(gameData)
+            });
 
-            if (error) throw error;
+            if (!response.ok) throw new Error("Erro ao conectar com o banco de dados.");
 
-            // Lógica de notificação solicitada
-            const postId = data[0].id;
-            const msg = "Publicação concluída!\n\nOK: Ver a página do jogo\nCANCELAR: Voltar ao início";
+            // 2. NOTIFICAÇÃO E REDIRECIONAMENTO
+            const msg = "Publicação concluída com sucesso!\n\nClique em OK para ver a página do jogo ou CANCELAR para voltar ao início.";
             
             if (confirm(msg)) {
-                window.location.href = `post.html?id=${postId}`;
+                // Direciona para a página do post (na mesma pasta /pages/)
+                // Passamos o ID na URL para que o post.html saiba o que carregar
+                window.location.href = `post.html?id=${uniqueId}`;
             } else {
+                // Direciona para a tela inicial (subindo um nível de pasta)
                 window.location.href = '../index.html';
             }
 
         } catch (err) {
-            // Captura o erro da linha 50
-            console.error("Erro detalhado capturado:", err);
+            console.error("Falha no envio:", err);
             
-            if (err.message === "Failed to fetch") {
-                alert("Erro de Conexão: O navegador não conseguiu falar com o servidor. Desative o 'Shield' do Brave (ícone do leão) para este site.");
-            } else {
-                alert("Erro ao publicar: " + err.message);
-            }
+            // Tratamento de erro amigável para o usuário
+            alert("Erro ao publicar o jogo: " + err.message + "\nVerifique sua conexão ou se a API do SheetDB está correta.");
             
+            // Reativa o botão para o usuário tentar novamente
             submitBtn.disabled = false;
             submitBtn.innerText = "Publicar Jogo";
         }
