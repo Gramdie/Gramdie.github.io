@@ -3,130 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carregando... - Gramdie Games</title>
+    <title>Gramdie Games</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #121212;
-            --card-bg: #1e1e1e;
-            --text-main: #ffffff;
-            --text-gray: #888888;
+            --bg: #121212; --card-bg: #1e1e1e;
+            --text-main: #ffffff; --text-gray: #888888;
             --blue: #1e90ff;
         }
-
-        body.light-mode {
-            --bg: #ffffff;
-            --card-bg: #f0f0f0;
-            --text-main: #121212;
-            --text-gray: #666666;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: 'Inclusive Sans', sans-serif;
-            margin: 0;
-            transition: 0.3s;
-        }
-
-        header {
-            padding: 20px 5%;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .btn-back {
-            text-decoration: none;
-            color: var(--blue);
-            font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 5%;
-        }
-
-        .post-banner {
-            width: 100%;
-            height: 450px;
-            object-fit: cover;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-        }
-
+        body { background-color: var(--bg); color: var(--text-main); font-family: 'Inclusive Sans', sans-serif; margin: 0; }
+        header { padding: 20px 5%; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .btn-back { text-decoration: none; color: var(--blue); font-weight: bold; display: inline-flex; align-items: center; gap: 10px; }
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 5%; }
+        .post-banner { width: 100%; height: 450px; object-fit: cover; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
         .info-header { margin-top: 30px; }
         .info-header h1 { font-size: 42px; margin-bottom: 10px; }
-
-        .meta-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 25px;
-            color: var(--text-gray);
-            font-size: 14px;
-        }
-
-        .meta-item i { color: var(--blue); margin-right: 5px; }
-
+        .meta-row { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 25px; color: var(--text-gray); font-size: 14px; }
         .genre-box { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-
-        .genre-tag {
-            background: #333;
-            color: #ccc;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-        }
-
-        .description {
-            font-size: 18px;
-            line-height: 1.8;
-            color: var(--text-main);
-            opacity: 0.8;
-            margin: 30px 0;
-            white-space: pre-wrap;
-        }
-
-        .download-area {
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .btn-mega-download {
-            background: var(--blue);
-            color: white;
-            padding: 18px 50px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-size: 22px;
-            font-weight: bold;
-            display: inline-block;
-            transition: 0.3s;
-            box-shadow: 0 5px 20px rgba(30, 144, 255, 0.4);
-        }
-
-        .btn-mega-download:hover { transform: translateY(-3px); filter: brightness(1.2); }
-
-        /* Tela de Carregamento */
-        #loading {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg); display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; z-index: 9999;
-        }
+        .genre-tag { background: #333; color: #ccc; padding: 4px 12px; border-radius: 6px; font-size: 12px; }
+        .description { font-size: 18px; line-height: 1.8; opacity: 0.8; margin: 30px 0; white-space: pre-wrap; }
+        .download-area { background: var(--card-bg); padding: 40px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .btn-mega-download { background: var(--blue); color: white; padding: 18px 50px; border-radius: 50px; text-decoration: none; font-size: 22px; font-weight: bold; display: inline-block; transition: 0.3s; }
         
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-left-color: var(--blue);
-            border-radius: 50%; width: 40px; height: 40px;
-            animation: spin 1s linear infinite; margin-bottom: 20px;
-        }
+        /* Nova seção VirusTotal */
+        .vt-check-area { margin-top: 20px; font-size: 14px; color: var(--text-gray); }
+        .vt-check-area a { color: var(--blue); text-decoration: none; font-weight: bold; cursor: pointer; }
+        
+        /* Modal de Notificação */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 10000; }
+        .modal-box { background: var(--card-bg); padding: 30px; border-radius: 15px; max-width: 400px; text-align: center; border: 1px solid var(--blue); }
+        .modal-box p { margin-bottom: 20px; line-height: 1.5; }
+        .modal-btns { display: flex; flex-direction: column; gap: 10px; }
+        .btn-modal { padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; }
+        .btn-confirm { background: var(--blue); color: white; }
+        .btn-close { background: #333; color: white; }
+        .checkbox-row { margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; }
+
+        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
+        .spinner { border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: var(--blue); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
@@ -144,29 +59,37 @@
     </header>
 
     <div class="container" id="content" style="display: none;">
-        <img id="gameBanner" src="" alt="Banner do Jogo" class="post-banner">
-        
+        <img id="gameBanner" src="" alt="Banner" class="post-banner">
         <div class="info-header">
-            <h1 id="gameTitle">Título do Jogo</h1>
-            
+            <h1 id="gameTitle">Título</h1>
             <div class="meta-row">
-                <div class="meta-item">
-                    <i class="fas fa-calendar-alt"></i> Postado em: <span id="postDate">--/--/----</span>
-                </div>
-                <div class="meta-item">
-                    <i class="fas fa-gamepad"></i> Gêneros: 
-                    <div class="genre-box" id="gameGenres"></div>
-                </div>
+                <div class="meta-item"><i class="fas fa-calendar-alt"></i> Postado em: <span id="postDate"></span></div>
+                <div class="meta-item"><i class="fas fa-gamepad"></i> Gêneros: <div class="genre-box" id="gameGenres"></div></div>
             </div>
         </div>
-
         <div class="description" id="gameDesc"></div>
-
         <div class="download-area">
-            <h3 style="margin-bottom: 20px;">Download Abaixo</h3>
-            <a href="#" id="gameLink" target="_blank" class="btn-mega-download">
-                <i class="fas fa-cloud-download-alt"></i> Baixar
-            </a>
+            <h3>Download Abaixo</h3>
+            <a href="#" id="gameLink" target="_blank" class="btn-mega-download">Baixar</a>
+            
+            <div class="vt-check-area">
+                Quer testar se o Jogo pode ser um vírus? <br>
+                Teste em <a onclick="abrirVerificacaoVT()">VirusTotal</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="vtModal">
+        <div class="modal-box">
+            <p>Deseja testar o link de download no VirusTotal? O link foi copiado para sua área de transferência.</p>
+            <div class="modal-btns">
+                <button class="btn-modal btn-confirm" onclick="irParaVT()">Sim, abrir VirusTotal</button>
+                <button class="btn-modal btn-close" onclick="fecharVTModal()">Agora não</button>
+            </div>
+            <div class="checkbox-row">
+                <input type="checkbox" id="dontShowVT">
+                <label for="dontShowVT">Não mostrar novamente</label>
+            </div>
         </div>
     </div>
 
