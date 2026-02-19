@@ -1,5 +1,5 @@
 // 1. CONFIGURAÇÃO DA API (SheetDB)
-const SHEETDB_URL = "https://sheetdb.io/api/v1/SUA_ID_AQUI"; 
+const SHEETDB_URL = "https://sheetdb.io/api/v1/9sv7pjhrhpwbq"; 
 
 // 2. SELETORES DO DOM (Baseados no seu index (1).html)
 const gamesGrid = document.getElementById('games-grid'); // ID Correto
