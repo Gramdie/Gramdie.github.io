@@ -26,19 +26,16 @@
         .download-area { background: var(--card-bg); padding: 40px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
         .btn-mega-download { background: var(--blue); color: white; padding: 18px 50px; border-radius: 50px; text-decoration: none; font-size: 22px; font-weight: bold; display: inline-block; transition: 0.3s; }
         
-        /* Nova seção VirusTotal */
         .vt-check-area { margin-top: 20px; font-size: 14px; color: var(--text-gray); }
-        .vt-check-area a { color: var(--blue); text-decoration: none; font-weight: bold; cursor: pointer; }
+        .vt-check-area span { color: var(--blue); text-decoration: underline; cursor: pointer; font-weight: bold; }
         
-        /* Modal de Notificação */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 10000; }
+        /* Modal Style */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 10000; }
         .modal-box { background: var(--card-bg); padding: 30px; border-radius: 15px; max-width: 400px; text-align: center; border: 1px solid var(--blue); }
-        .modal-box p { margin-bottom: 20px; line-height: 1.5; }
-        .modal-btns { display: flex; flex-direction: column; gap: 10px; }
-        .btn-modal { padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; }
+        .modal-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .btn-modal { padding: 12px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; }
         .btn-confirm { background: var(--blue); color: white; }
         .btn-close { background: #333; color: white; }
-        .checkbox-row { margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; }
 
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
         .spinner { border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: var(--blue); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 20px; }
@@ -74,19 +71,19 @@
             
             <div class="vt-check-area">
                 Quer testar se o Jogo pode ser um vírus? <br>
-                Teste em <a onclick="abrirVerificacaoVT()">VirusTotal</a>
+                Teste em <span onclick="abrirVerificacaoVT()">VirusTotal</span>
             </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="vtModal">
         <div class="modal-box">
-            <p>Deseja testar o link de download no VirusTotal? O link foi copiado para sua área de transferência.</p>
+            <p>O link de download foi copiado. Deseja abrir o VirusTotal para verificar o ficheiro?</p>
             <div class="modal-btns">
                 <button class="btn-modal btn-confirm" onclick="irParaVT()">Sim, abrir VirusTotal</button>
                 <button class="btn-modal btn-close" onclick="fecharVTModal()">Agora não</button>
             </div>
-            <div class="checkbox-row">
+            <div style="margin-top: 15px; font-size: 12px;">
                 <input type="checkbox" id="dontShowVT">
                 <label for="dontShowVT">Não mostrar novamente</label>
             </div>
