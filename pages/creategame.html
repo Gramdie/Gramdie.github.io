@@ -3,71 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Postar Novo Jogo - Gramdie Games</title>
+    <title>Publicar Novo Jogo - Gramdie</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/create-style.css"> <style>
+    <link rel="stylesheet" href="../css/create-style.css">
+    <style>
         :root {
             --bg: #121212;
             --card: #1e1e1e;
-            --blue: #1e90ff;
             --text: #ffffff;
+            --blue: #1e90ff;
+            --input: #2a2a2a;
         }
-        body { background: var(--bg); color: var(--text); font-family: 'Inclusive Sans', sans-serif; padding: 20px; }
-        .container { max-width: 700px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 15px; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; color: #888; }
-        input, textarea { 
-            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; 
-            background: #000; color: #fff; box-sizing: border-box; font-family: inherit;
-        }
-        .genre-grid { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
-            gap: 10px; background: #000; padding: 15px; border-radius: 8px; border: 1px solid #333;
-        }
-        .genre-option { font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
-        .btn-post { 
-            width: 100%; background: var(--blue); color: white; border: none; padding: 15px; 
-            border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px;
-        }
-        .btn-post:disabled { opacity: 0.5; cursor: not-allowed; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inclusive Sans', sans-serif; display: flex; justify-content: center; padding: 40px 20px; margin: 0; }
+        .container { background: var(--card); padding: 30px; border-radius: 15px; width: 100%; max-width: 650px; border: 1px solid #333; }
+        .btn-back { color: var(--blue); text-decoration: none; display: inline-block; margin-bottom: 25px; font-weight: bold; }
+        h2 { margin-top: 0; font-size: 24px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-size: 14px; color: #aaa; }
+        input, textarea { width: 100%; padding: 12px; background: var(--input); border: 1px solid #333; border-radius: 8px; color: white; font-size: 15px; outline: none; box-sizing: border-box; }
+        input:focus, textarea:focus { border-color: var(--blue); }
+        
+        /* Grid de Gêneros */
+        .genres-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; background: #181818; padding: 15px; border-radius: 8px; border: 1px solid #222; }
+        .genre-item { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; padding: 5px; border-radius: 4px; transition: 0.2s; }
+        .genre-item:hover { background: #2a2a2a; }
+        .genre-item input { width: auto; cursor: pointer; }
+
+        button { width: 100%; padding: 15px; background: var(--blue); border: none; border-radius: 10px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        button:hover { background: #0077ed; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <a href="../index.html" style="color: var(--blue); text-decoration: none;"><i class="fas fa-arrow-left"></i> Voltar</a>
-        <h2 style="margin-top: 20px;">Publicar no Repositório</h2>
-        
-        <div class="input-group">
-            <label>Título do Jogo</label>
-            <input type="text" id="gameTitle" placeholder="Ex: Elden Ring">
-        </div>
+        <a href="../index.html" class="btn-back"><i class="fas fa-arrow-left"></i> Voltar ao Início</a>
+        <h2>Publicar no Repositório</h2>
 
-        <div class="input-group">
-            <label>URL do Banner (Imagem)</label>
-            <input type="url" id="gameBanner" placeholder="https://linkdaimagem.com/foto.jpg">
-        </div>
+        <form id="createGameForm">
+            <div class="input-group">
+                <label for="title">Título do Jogo</label>
+                <input type="text" id="title" placeholder="Ex: Elden Ring" required>
+            </div>
 
-        <div class="input-group">
-            <label>Descrição</label>
-            <textarea id="gameDesc" rows="5" placeholder="Escreva os detalhes do jogo..."></textarea>
-        </div>
+            <div class="input-group">
+                <label for="banner">URL do Banner (Imagem)</label>
+                <input type="url" id="banner" placeholder="https://linkdaimagem.com/foto.jpg" required>
+            </div>
 
-        <div class="input-group">
-            <label>Gêneros (Selecione até 4)</label>
-            <div class="genre-grid" id="genreContainer">
+            <div class="input-group">
+                <label for="description">Descrição</label>
+                <textarea id="description" rows="4" placeholder="Escreva os detalhes e requisitos do jogo..." required></textarea>
+            </div>
+
+            <div class="input-group">
+                <label>Gêneros (Selecione os que se aplicam)</label>
+                <div class="genres-grid">
+                    <label class="genre-item"><input type="checkbox" value="RPG"> RPG</label>
+                    <label class="genre-item"><input type="checkbox" value="Ação"> Ação</label>
+                    <label class="genre-item"><input type="checkbox" value="Esporte"> Esporte</label>
+                    <label class="genre-item"><input type="checkbox" value="Corrida"> Corrida</label>
+                    <label class="genre-item"><input type="checkbox" value="Simulação"> Simulação</label>
+                    <label class="genre-item"><input type="checkbox" value="Plataforma"> Plataforma</label>
+                    <label class="genre-item"><input type="checkbox" value="Quebra-cabeça"> Quebra-cabeça</label>
+                    <label class="genre-item"><input type="checkbox" value="Erotico"> Erotico</label>
+                    <label class="genre-item"><input type="checkbox" value="Mundo Aberto"> Mundo Aberto</label>
+                    <label class="genre-item"><input type="checkbox" value="FPS"> FPS</label>
+                    <label class="genre-item"><input type="checkbox" value="Sobrevivência"> Sobrevivência</label>
+                    <label class="genre-item"><input type="checkbox" value="Terror"> Terror</label>
+                    <label class="genre-item"><input type="checkbox" value="Estratégia"> Estratégia</label>
+                    <label class="genre-item"><input type="checkbox" value="Luta"> Luta</label>
+                    <label class="genre-item"><input type="checkbox" value="Aventura"> Aventura</label>
+                    <label class="genre-item"><input type="checkbox" value="Rogue-like"> Rogue-like</label>
+                    <label class="genre-item"><input type="checkbox" value="Arcade"> Arcade</label>
+                    <label class="genre-item"><input type="checkbox" value="MMO"> MMO</label>
+                    <label class="genre-item"><input type="checkbox" value="Point and Click"> Point & Click</label>
+                    <label class="genre-item"><input type="checkbox" value="Visual Novel"> Visual Novel</label>
+                    <label class="genre-item"><input type="checkbox" value="Educativo"> Educativo</label>
+                    <label class="genre-item"><input type="checkbox" value="Musical"> Musical</label>
+                    <label class="genre-item"><input type="checkbox" value="Texto"> Texto</label>
                 </div>
-        </div>
+            </div>
 
-        <div class="input-group">
-            <label>Link de Download Principal</label>
-            <input type="url" id="gameLink" placeholder="Mediafire, Mega, Google Drive...">
-        </div>
+            <div class="input-group">
+                <label for="mainLink">Link de Download Principal</label>
+                <input type="url" id="mainLink" placeholder="Mediafire, Mega, Google Drive..." required>
+            </div>
 
-        <button class="btn-post" id="btnPublish">Publicar Jogo</button>
+            <button type="submit" id="submitBtn">Publicar Jogo</button>
+        </form>
     </div>
 
-    <script type="module" src="../js/postgame.js"></script>
+    <script type="module" src="../js/createlogic.js"></script>
 </body>
 </html>
