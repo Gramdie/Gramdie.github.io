@@ -1,16 +1,15 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-// --- CONFIGURAÇÃO ---
-// ATENÇÃO: Verifique se esta URL está correta conforme a sua imagem
-const SUPABASE_URL = 'https://vhybulaqcdunktgwxqbzn.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoeWJ1bGFxY2R1a3Rnd3hxYnpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NDQyOTgsImV4cCI6MjA4NzAyMDI5OH0.5obZrq54mSh1R3JzJ_lKokVVw4Yp2oostUMQLXzzR0s'; // Substitua pela sua chave real
+// 1. CONFIGURAÇÃO DO SUPABASE
+const SUPABASE_URL = 'https://vhybulaqcdunktgwxqbzn.supabase.co'; // URL extraída das suas imagens
+const SUPABASE_KEY = 'SUA_ANON_KEY_AQUI'; 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let pagina = 0;
 const limite = 50;
 let carregando = false;
 
-// --- GESTÃO DE TEMA (COOKIES) ---
+// 2. GESTÃO DE TEMA E COOKIES
 function setCookie(name, value) {
     document.cookie = `${name}=${value};path=/;max-age=31536000`;
 }
@@ -31,33 +30,13 @@ function aplicarTema(tema) {
     }
 }
 
-// --- CARREGAMENTO DE DADOS ---
-async function buscarJogos() {
-    if (carregando) return;
-    carregando = true;
-
-    const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .range(pagina * limite, (pagina + 1) * limite - 1);
-
-    if (error) {
-        console.error("Erro ao carregar jogos:", error.message);
-    } else if (data) {
-        renderizarCards(data);
-        if (pagina === 0) configurarPlaceholder(data);
-        pagina++;
-    }
-    carregando = false;
-}
-
+// 3. RENDERIZAÇÃO DOS CARDS
 function renderizarCards(jogos) {
     const grid = document.getElementById('games-grid');
     if (!grid) return;
 
     jogos.forEach(game => {
-        // Regra de 90 caracteres para descrição
+        // Detalhe: Descrição limitada a 90 caracteres
         const descOriginal = game.description || "";
         const descCurta = descOriginal.length > 90 ? descOriginal.substring(0, 90) + "..." : descOriginal;
         
@@ -66,13 +45,9 @@ function renderizarCards(jogos) {
         const card = document.createElement('div');
         card.className = 'game-card';
         
-        // CORREÇÃO: Redireciona para o post apenas se o ID existir
+        // Detalhe: Clicar no card abre a página do post (usando ID real)
         card.onclick = () => {
-            if (game.id) {
-                window.location.href = `pages/post.html?id=${game.id}`;
-            } else {
-                console.error("Este item não possui um ID válido no banco.");
-            }
+            if (game.id) window.location.href = `pages/post.html?id=${game.id}`;
         };
 
         card.innerHTML = `
@@ -101,20 +76,18 @@ function detectarProvedores(link) {
                 .map(h => `<span class="tag-provider">${h}</span>`).join(' ');
 }
 
-// --- BUSCA DINÂMICA ---
-const searchInput = document.getElementById('searchInput');
-const searchResults = document.getElementById('searchResults');
+// 4. BUSCA DINÂMICA
+async function iniciarBusca() {
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
 
-function configurarPlaceholder(jogos) {
-    const rand = jogos[Math.floor(Math.random() * jogos.length)];
-    if (rand && searchInput) searchInput.placeholder = `Ex: ${rand.title}`;
-}
+    if (!searchInput) return;
 
-if (searchInput) {
     searchInput.oninput = async () => {
         const termo = searchInput.value.trim();
         if (termo.length < 2) { searchResults.style.display = 'none'; return; }
 
+        // Detalhe: Máximo de 12 jogos na lista da pesquisa
         const { data } = await supabase
             .from('posts')
             .select('id, title, banner')
@@ -131,14 +104,40 @@ if (searchInput) {
             searchResults.style.display = 'block';
         }
     };
-    
-    // Pesquisa ao apertar Enter
-    searchInput.onkeypress = (e) => {
+
+    // Detalhe: Pesquisar ao apertar Enter
+    searchInput.onkeydown = (e) => {
         if (e.key === 'Enter') searchResults.style.display = 'none';
     };
 }
 
-// --- INICIALIZAÇÃO SEGURA (Corrige Erro de Null) ---
+// 5. CARREGAMENTO INICIAL E SCROLL INFINITO
+async function buscarJogos() {
+    if (carregando) return;
+    carregando = true;
+
+    // Detalhe: Carrega de 50 em 50 jogos
+    const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(pagina * limite, (pagina + 1) * limite - 1);
+
+    if (error) {
+        console.error("Erro ao carregar:", error.message);
+    } else if (data) {
+        renderizarCards(data);
+        if (pagina === 0) {
+            // Detalhe: Placeholder aleatório na primeira carga
+            const rand = data[Math.floor(Math.random() * data.length)];
+            if (rand) document.getElementById('searchInput').placeholder = `Ex: ${rand.title}`;
+        }
+        pagina++;
+    }
+    carregando = false;
+}
+
+// 6. INICIALIZAÇÃO SEGURA (CORRIGE ERRO DE NULL)
 document.addEventListener('DOMContentLoaded', () => {
     aplicarTema(getCookie('theme') || 'dark');
 
@@ -156,20 +155,23 @@ document.addEventListener('DOMContentLoaded', () => {
         addBtn.onclick = () => window.location.href = 'pages/creategame.html';
     }
 
-    // Scroll Infinito (50 em 50)
+    iniciarBusca();
+
+    // Scroll Infinito usando o sentinel do HTML
     const observer = new IntersectionObserver(entries => {
         if (entries[0].isIntersecting) buscarJogos();
-    }, { threshold: 0.1 });
-
+    });
+    
     const sentinel = document.getElementById('loading-trigger');
     if (sentinel) observer.observe(sentinel);
 
     buscarJogos();
 });
 
-// Fechar busca ao clicar fora
+// Fechar resultados ao clicar fora
 document.addEventListener('click', (e) => {
-    if (searchResults && !e.target.closest('.search-container')) {
-        searchResults.style.display = 'none';
+    const results = document.getElementById('searchResults');
+    if (results && !e.target.closest('.search-container')) {
+        results.style.display = 'none';
     }
 });
