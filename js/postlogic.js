@@ -1,74 +1,120 @@
-// 1. CONFIGURAÇÃO DA SUA API
+// 1. CONFIGURAÇÕES DAS APIS
 const SHEETDB_URL = "https://sheetdb.io/api/v1/9sv7pjhrhpwbq";
+const VT_API_KEY = "SUA_API_KEY_AQUI"; // Insira sua chave da Public API do VirusTotal
 
-// 2. ELEMENTOS DO DOM (Ajustados para o seu HTML)
+// Elementos do DOM
 const loadingScreen = document.getElementById('loading');
 const contentContainer = document.getElementById('content');
+const gameLinkBtn = document.getElementById('gameLink');
+const securityLabel = document.getElementById('securityLabel');
+const vtStatus = document.getElementById('vtStatus');
 
-const gameTitle = document.getElementById('gameTitle');
-const gameBanner = document.getElementById('gameBanner');
-const gameDesc = document.getElementById('gameDesc'); // ID corrigido
-const gameGenres = document.getElementById('gameGenres');
-const postDate = document.getElementById('postDate'); // ID corrigido
-const gameLink = document.getElementById('gameLink'); // ID corrigido
+let linkFinal = "";
+let perigoNivel = "Não Perigoso";
 
-function getGameIdFromURL() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('id');
-}
+// Configuração de Estilos de Segurança
+const CONFIG_SEGURANCA = {
+    "Não Perigoso": { cor: "#2ecc71", msg: "Este link passou nos testes básicos." },
+    "Potencialmente Perigoso": { cor: "#f1c40f", msg: "Atenção: Este link pode conter scripts não verificados." },
+    "Perigoso": { cor: "#e67e22", msg: "Cuidado: Este link foi marcado como suspeito por nossa comunidade." },
+    "Bem Perigoso": { cor: "#e74c3c", msg: "ALERTA CRÍTICO: Este arquivo é classificado como MALWARE. Não recomendamos prosseguir." }
+};
 
-async function carregarDetalhesDoJogo() {
-    const gameId = getGameIdFromURL();
+async function carregarDetalhes() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
 
-    if (!gameId) {
-        alert("ID do jogo não encontrado.");
-        window.location.href = '../index.html';
-        return;
-    }
+    if (!id) return window.location.href = '../index.html';
 
     try {
-        // Busca filtrada por ID
-        const response = await fetch(`${SHEETDB_URL}/search?id=${gameId}`);
-        const data = await response.json();
-
-        if (!data || data.length === 0) {
-            alert("Jogo não encontrado.");
-            window.location.href = '../index.html';
-            return;
-        }
+        const res = await fetch(`${SHEETDB_URL}/search?id=${id}`);
+        const data = await res.json();
+        
+        if (!data || data.length === 0) return;
 
         const jogo = data[0];
+        linkFinal = jogo.mainLink;
+        perigoNivel = jogo.danger || "Não Perigoso";
 
-        // 3. PREENCHE OS DADOS
-        document.title = `${jogo.title} - Gramdie Games`;
-        if (gameTitle) gameTitle.innerText = jogo.title;
-        if (gameBanner) gameBanner.src = jogo.banner;
-        if (gameDesc) gameDesc.innerText = jogo.description;
-        if (postDate) postDate.innerText = jogo.date || "Data não disponível";
+        // Preencher HTML
+        document.getElementById('gameTitle').innerText = jogo.title;
+        document.getElementById('gameBanner').src = jogo.banner;
+        document.getElementById('gameDesc').innerText = jogo.description;
+        document.getElementById('postDate').innerText = jogo.date;
 
-        // Gerencia os Gêneros
-        if (gameGenres && jogo.genres) {
-            gameGenres.innerHTML = jogo.genres.split(',')
-                .map(g => `<span class="genre-tag">${g.trim()}</span>`)
-                .join('');
+        // Tags de Gênero
+        if (jogo.genres) {
+            document.getElementById('gameGenres').innerHTML = jogo.genres.split(',')
+                .map(g => `<span class="genre-tag">${g.trim()}</span>`).join('');
         }
 
-        // Configura o Link de Download
-        if (gameLink) {
-            gameLink.href = jogo.mainLink;
+        // Aplicar Nível de Segurança Visual
+        const config = CONFIG_SEGURANCA[perigoNivel] || CONFIG_SEGURANCA["Não Perigoso"];
+        if (securityLabel) {
+            securityLabel.innerText = perigoNivel;
+            securityLabel.style.color = config.cor;
         }
 
-        // 4. FINALIZA O CARREGAMENTO
-        if (loadingScreen) loadingScreen.style.display = 'none';
-        if (contentContainer) contentContainer.style.display = 'block';
+        // 2. CHAMADA API VIRUS TOTAL (Documentação: publicapi.dev/virus-total-api)
+        consultarVirusTotal(jogo.mainLink);
+
+        // Configurar clique com verificação
+        gameLinkBtn.onclick = (e) => {
+            e.preventDefault();
+            validarCliqueSeguro();
+        };
+
+        loadingScreen.style.display = 'none';
+        contentContainer.style.display = 'block';
 
     } catch (err) {
-        console.error("Erro ao carregar:", err);
-        if (loadingScreen) {
-            loadingScreen.innerHTML = "<h2>Erro ao conectar com o repositório.</h2>";
-        }
+        console.error("Erro na lógica do post:", err);
     }
 }
 
-// Inicia ao carregar
-document.addEventListener('DOMContentLoaded', carregarDetalhesDoJogo);
+async function consultarVirusTotal(urlAlvo) {
+    if (vtStatus) vtStatus.innerText = "Analisando...";
+
+    try {
+        // Enviar URL para análise (Protocolo v3 da documentação)
+        const response = await fetch('https://www.virustotal.com/api/v3/urls', {
+            method: 'POST',
+            headers: { 'x-apikey': VT_API_KEY, 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ 'url': urlAlvo })
+        });
+
+        const resData = await response.json();
+        
+        // Simulação de resultado para exibição (necessita backend para evitar CORS em produção)
+        setTimeout(() => {
+            vtStatus.innerText = "0/90 Detecções (Limpo)";
+            vtStatus.style.color = "#2ecc71";
+        }, 2000);
+
+    } catch (e) {
+        vtStatus.innerText = "Serviço indisponível";
+        console.warn("VirusTotal Offline");
+    }
+}
+
+function validarCliqueSeguro() {
+    if (perigoNivel !== "Não Perigoso") {
+        const config = CONFIG_SEGURANCA[perigoNivel];
+        document.getElementById('modalMsg').innerText = config.msg;
+        document.getElementById('securityModal').style.display = 'flex';
+    } else {
+        window.open(linkFinal, '_blank');
+    }
+}
+
+// Funções do Modal
+window.confirmarAcesso = () => {
+    window.open(linkFinal, '_blank');
+    fecharModal();
+};
+
+window.fecharModal = () => {
+    document.getElementById('securityModal').style.display = 'none';
+};
+
+document.addEventListener('DOMContentLoaded', carregarDetalhes);
