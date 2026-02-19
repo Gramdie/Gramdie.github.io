@@ -1,58 +1,71 @@
+// 1. CONFIGURAÇÃO DA SUA API
 const SHEETDB_URL = "https://sheetdb.io/api/v1/9sv7pjhrhpwbq";
 
-document.addEventListener('DOMContentLoaded', () => {
-    const gamesGrid = document.getElementById('games-grid');
-    const loadingTrigger = document.getElementById('loading-trigger');
-    const addGameBtn = document.getElementById('addGameBtn');
+// 2. ELEMENTOS DO DOM (IDs corrigidos para bater com o post.html)
+const gameTitle = document.getElementById('gameTitle');
+const gameBanner = document.getElementById('gameBanner');
+const gameDesc = document.getElementById('gameDesc'); // Era gameDescription
+const gameGenres = document.getElementById('gameGenres');
+const postDate = document.getElementById('postDate'); // Era gameDate
+const gameLink = document.getElementById('gameLink'); // Era downloadBtn
+const loading = document.getElementById('loading');
+const content = document.getElementById('content');
 
-    // Botão de adicionar jogo
-    if (addGameBtn) {
-        addGameBtn.addEventListener('click', () => {
-            window.location.href = 'pages/creategame.html';
-        });
+/**
+ * Obtém o ID do jogo a partir da URL da página
+ */
+function getGameIdFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('id');
+}
+
+/**
+ * Procura os dados do jogo na API e preenche a página
+ */
+async function carregarDetalhesDoJogo() {
+    const gameId = getGameIdFromURL();
+
+    if (!gameId) {
+        console.error("ID do jogo não encontrado na URL");
+        window.location.href = '../index.html';
+        return;
     }
 
-    async function carregarJogos() {
-        try {
-            const response = await fetch(SHEETDB_URL);
-            const gamesData = await response.json();
+    try {
+        const response = await fetch(`${SHEETDB_URL}/search?id=${gameId}`);
+        const data = await response.json();
 
-            if (loadingTrigger) loadingTrigger.style.display = 'none';
-            if (gamesGrid) gamesGrid.innerHTML = '';
-
-            gamesData.reverse().forEach(jogo => {
-                const card = document.createElement('div');
-                card.className = 'game-card';
-                
-                // O SEGREDO: O ID deve vir da sua planilha SheetDB
-                card.onclick = () => {
-                    if (jogo.id) {
-                        window.location.href = `pages/post.html?id=${jogo.id}`;
-                    } else {
-                        console.log("Erro: Jogo sem ID na planilha");
-                    }
-                };
-
-                const tagsGenero = jogo.genres 
-                    ? jogo.genres.split(',').map(g => `<span class="tag-genre">${g.trim()}</span>`).join('') 
-                    : '<span class="tag-genre">Geral</span>';
-
-                card.innerHTML = `
-                    <img src="${jogo.banner}" alt="${jogo.title}">
-                    <div class="card-content">
-                        <span class="post-date">${jogo.date || 'Recente'}</span>
-                        <h3>${jogo.title}</h3>
-                        <div class="genre-tags">${tagsGenero}</div>
-                        <div class="provider-tags">
-                            <span class="tag-provider"><i class="fas fa-cloud"></i> Cloud</span>
-                        </div>
-                    </div>
-                `;
-                gamesGrid.appendChild(card);
-            });
-        } catch (err) {
-            console.log("Erro ao carregar banco de dados");
+        if (data.length === 0) {
+            console.error("Jogo não encontrado no repositório");
+            window.location.href = '../index.html';
+            return;
         }
+
+        const jogo = data[0];
+
+        // 3. PREENCHE OS DADOS NA TELA
+        if (gameTitle) gameTitle.innerText = jogo.title;
+        if (gameBanner) gameBanner.src = jogo.banner;
+        if (gameDesc) gameDesc.innerText = jogo.description;
+        if (postDate) postDate.innerText = jogo.date;
+
+        if (gameGenres && jogo.genres) {
+            gameGenres.innerHTML = jogo.genres.split(',')
+                .map(g => `<span class="genre-tag">${g.trim()}</span>`)
+                .join('');
+        }
+
+        if (gameLink) {
+            gameLink.href = jogo.mainLink;
+        }
+
+        // 4. EXIBE O CONTEÚDO E ESCONDE O LOADING
+        if (loading) loading.style.display = 'none';
+        if (content) content.style.display = 'block';
+
+    } catch (err) {
+        console.error("Erro ao carregar o post:", err);
     }
-    carregarJogos();
-});
+}
+
+document.addEventListener('DOMContentLoaded', carregarDetalhesDoJogo);
