@@ -8,10 +8,10 @@ let pagina = 0;
 const limite = 50;
 let carregando = false;
 
-// --- FUNÇÕES DE COOKIE ---
-function setCookie(name, value, days) {
+// --- COOKIES E TEMA ---
+function setCookie(name, value) {
     const d = new Date();
-    d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+    d.setTime(d.getTime() + (365*24*60*60*1000));
     document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
 }
 
@@ -20,7 +20,6 @@ function getCookie(name) {
     return v ? v[2] : null;
 }
 
-// --- CONTROLE DE TEMA (COM PERSISTÊNCIA) ---
 const themeBtn = document.getElementById('themeBtn');
 const themeIcon = document.getElementById('themeIcon');
 
@@ -34,38 +33,30 @@ function aplicarTema(tema) {
     }
 }
 
-// Carregar preferência salva
-const temaSalvo = getCookie('user-theme') || 'dark';
-aplicarTema(temaSalvo);
+aplicarTema(getCookie('theme') || 'dark');
 
 themeBtn.onclick = () => {
     const novoTema = document.body.classList.contains('light-mode') ? 'dark' : 'light';
     aplicarTema(novoTema);
-    setCookie('user-theme', novoTema, 365);
+    setCookie('theme', novoTema);
 };
 
 // --- NAVEGAÇÃO ---
 document.getElementById('addGameBtn').onclick = () => window.location.href = 'pages/creategame.html';
 
-// --- CARREGAMENTO DE JOGOS ---
+// --- CARREGAMENTO ---
 async function carregarJogos() {
     if (carregando) return;
     carregando = true;
 
-    // Busca sem exigir created_at para evitar erro 42703
     const { data, error } = await supabase
         .from('posts')
         .select('*')
         .range(pagina * limite, (pagina + 1) * limite - 1);
 
-    if (error) {
-        console.error("Erro Supabase:", error.message);
-        return;
-    }
-
-    if (data && data.length > 0) {
+    if (!error && data) {
         renderizarCards(data);
-        if (pagina === 0) setRandomPlaceholder(data);
+        if (pagina === 0) setPlaceholder(data);
         pagina++;
     }
     carregando = false;
@@ -74,20 +65,28 @@ async function carregarJogos() {
 function renderizarCards(jogos) {
     const grid = document.getElementById('games-grid');
     jogos.forEach(game => {
-        const desc = game.description || "";
-        const descExibida = desc.length > 90 ? desc.substring(0, 90) + "..." : desc;
-        const tagsHtml = gerarTags(game.mainLink);
+        const desc = (game.description || "").substring(0, 90) + (game.description?.length > 90 ? "..." : "");
+        const dataPost = game.created_at ? new Date(game.created_at).toLocaleDateString('pt-BR') : "--/--/--";
+        
+        // Tags de gênero (Cinza)
+        const generosHtml = (game.genres || "").split(',').map(g => `<span class="tag-genre">${g.trim()}</span>`).join('');
+        
+        // Tags de provedor (Azul)
+        const hosts = ['mediafire', 'google', 'mega', 'pcloud', 'box', 'icloud'];
+        const providersHtml = hosts.filter(h => game.mainLink?.toLowerCase().includes(h))
+                                   .map(h => `<span class="tag-provider">${h}</span>`).join('');
 
         const card = document.createElement('div');
         card.className = 'game-card';
         card.onclick = () => window.location.href = `pages/post.html?id=${game.id}`;
-        
         card.innerHTML = `
-            <img src="${game.banner || 'img/placeholder.jpg'}" alt="${game.title}">
+            <img src="${game.banner || 'img/placeholder.jpg'}">
             <div class="card-content">
+                <div class="post-date">Postado em ${dataPost}</div>
                 <h3 style="margin:0">${game.title}</h3>
-                <p class="card-desc">${descExibida}</p>
-                <div class="tags">${tagsHtml}</div>
+                <p class="card-desc">${desc}</p>
+                <div class="genre-tags">${generosHtml}</div>
+                <div class="provider-tags">${providersHtml}</div>
                 <a href="${game.mainLink}" target="_blank" class="btn-download" onclick="event.stopPropagation()">Download</a>
             </div>
         `;
@@ -95,13 +94,7 @@ function renderizarCards(jogos) {
     });
 }
 
-function gerarTags(link) {
-    const hosts = ['mediafire', 'google', 'mega', 'pcloud', 'box', 'icloud'];
-    return hosts.filter(h => link.toLowerCase().includes(h))
-                .map(h => `<span class="tag">${h}</span>`).join('');
-}
-
-// --- BUSCA DINÂMICA (MAX 12) ---
+// --- BUSCA ---
 const searchInput = document.getElementById('searchInput');
 const resultsBox = document.getElementById('searchResults');
 
@@ -111,7 +104,7 @@ searchInput.oninput = async () => {
 
     const { data } = await supabase.from('posts').select('id, title, banner').ilike('title', `%${termo}%`).limit(12);
 
-    if (data && data.length > 0) {
+    if (data?.length > 0) {
         resultsBox.innerHTML = data.map(j => `
             <div class="result-item" onclick="window.location.href='pages/post.html?id=${j.id}'">
                 <img src="${j.banner}">
@@ -122,15 +115,11 @@ searchInput.oninput = async () => {
     }
 };
 
-function setRandomPlaceholder(jogos) {
+function setPlaceholder(jogos) {
     const r = jogos[Math.floor(Math.random() * jogos.length)];
     if (r) searchInput.placeholder = `Ex: ${r.title}`;
 }
 
-// Scroll Infinito
-const observer = new IntersectionObserver(entries => {
-    if (entries[0].isIntersecting) carregarJogos();
-});
+const observer = new IntersectionObserver(e => e[0].isIntersecting && carregarJogos());
 observer.observe(document.getElementById('loading-trigger'));
-
 carregarJogos();
