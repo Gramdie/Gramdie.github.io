@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Postar Jogo | Gramdie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --bg: #1C1C1C; 
+            --card: #262626; 
+            --blue: #1E90FF; 
+            --txt: #ffffff; 
+            --gray: #888888;
+        }
+
+        body { 
+            background: var(--bg); 
+            color: var(--txt); 
+            font-family: 'Inclusive Sans', sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            padding: 40px 20px; 
+            margin: 0; 
+        }
+        
+        .form-container { 
+            background: var(--card); 
+            padding: 40px; 
+            border-radius: 24px; 
+            width: 100%; 
+            max-width: 650px; 
+            border: 1px solid #333; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+        }
+
+        h2 { margin-top: 0; color: var(--blue); font-size: 28px; }
+        p.subtitle { color: var(--gray); margin-bottom: 30px; font-size: 14px; }
+        
+        .field-group { margin-bottom: 22px; }
+        
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            color: var(--blue); 
+        }
+        
+        input, textarea { 
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 12px; 
+            border: 1px solid #444; 
+            background: #111; 
+            color: white; 
+            box-sizing: border-box; 
+            font-family: inherit; 
+            font-size: 15px; 
+            outline: none; 
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus { border-color: var(--blue); }
+        
+        .btn-post { 
+            background: var(--blue); 
+            color: white; 
+            border: none; 
+            padding: 20px; 
+            width: 100%; 
+            border-radius: 15px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 20px; 
+            font-size: 18px; 
+            transition: 0.3s;
+        }
+
+        .btn-post:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        .btn-post:disabled { background: #444; cursor: not-allowed; opacity: 0.6; transform: none; }
+
+        #status { 
+            margin-top: 20px; 
+            text-align: center; 
+            font-size: 14px; 
+            display: none; 
+            padding: 10px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Postar Jogo Anônimo</h2>
+        <p class="subtitle">Seu jogo será armazenado de forma segura no banco de dados Supabase.</p>
+        
+        <div class="field-group">
+            <label>Banner do Jogo (URL da Imagem)</label>
+            <input type="url" id="banner" placeholder="Ex: https://i.imgur.com/link.png">
+        </div>
+
+        <div class="field-group">
+            <label>Título (Até 40 caracteres)</label>
+            <input type="text" id="title" maxlength="40" placeholder="Nome do Jogo" required>
+        </div>
+
+        <div class="field-group">
+            <label>Descrição (Até 1200 caracteres)</label>
+            <textarea id="desc" rows="4" maxlength="1200" placeholder="Fale sobre o jogo, requisitos, etc..."></textarea>
+        </div>
+
+        <div class="field-group">
+            <label>Link de Download (MEGA, Drive, Mediafire...)</label>
+            <input type="url" id="mainLink" placeholder="Link completo do arquivo" required>
+        </div>
+
+        <div class="field-group">
+            <label>Nome do Autor (Opcional)</label>
+            <input type="text" id="author" placeholder="Deixe vazio para gerar ID aleatório">
+        </div>
+
+        <button class="btn-post" id="btnSubmit">Publicar na Nuvem</button>
+        
+        <div id="status"></div>
+    </div>
+
+    <script type="module" src="../js/postGame.js"></script>
+</body>
+</html>
