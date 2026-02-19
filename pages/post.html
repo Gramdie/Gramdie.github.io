@@ -12,24 +12,23 @@
             --text-main: #ffffff; --text-gray: #888888;
             --blue: #1e90ff;
         }
-        body { background-color: var(--bg); color: var(--text-main); font-family: 'Inclusive Sans', sans-serif; margin: 0; }
+        body { background-color: var(--bg); color: var(--text-main); font-family: 'Inclusive Sans', sans-serif; margin: 0; transition: 0.3s; }
         header { padding: 20px 5%; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .btn-back { text-decoration: none; color: var(--blue); font-weight: bold; display: inline-flex; align-items: center; gap: 10px; }
         .container { max-width: 1000px; margin: 40px auto; padding: 0 5%; }
-        .post-banner { width: 100%; height: 450px; object-fit: cover; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
+        .post-banner { width: 100%; height: 450px; object-fit: cover; border-radius: 20px; }
         .info-header { margin-top: 30px; }
-        .info-header h1 { font-size: 42px; margin-bottom: 10px; }
         .meta-row { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 25px; color: var(--text-gray); font-size: 14px; }
         .genre-box { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
         .genre-tag { background: #333; color: #ccc; padding: 4px 12px; border-radius: 6px; font-size: 12px; }
         .description { font-size: 18px; line-height: 1.8; opacity: 0.8; margin: 30px 0; white-space: pre-wrap; }
         .download-area { background: var(--card-bg); padding: 40px; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-        .btn-mega-download { background: var(--blue); color: white; padding: 18px 50px; border-radius: 50px; text-decoration: none; font-size: 22px; font-weight: bold; display: inline-block; transition: 0.3s; }
+        .btn-mega-download { background: var(--blue); color: white; padding: 18px 50px; border-radius: 50px; text-decoration: none; font-size: 22px; font-weight: bold; display: inline-block; }
         
-        .vt-check-area { margin-top: 20px; font-size: 14px; color: var(--text-gray); }
-        .vt-check-area span { color: var(--blue); text-decoration: underline; cursor: pointer; font-weight: bold; }
+        /* VirusTotal Styling */
+        .vt-area { margin-top: 20px; font-size: 14px; color: var(--text-gray); }
+        .vt-link { color: var(--blue); text-decoration: underline; cursor: pointer; font-weight: bold; }
         
-        /* Modal Style */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 10000; }
         .modal-box { background: var(--card-bg); padding: 30px; border-radius: 15px; max-width: 400px; text-align: center; border: 1px solid var(--blue); }
         .modal-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
@@ -50,9 +49,7 @@
     </div>
 
     <header>
-        <a href="../index.html" class="btn-back">
-            <i class="fas fa-arrow-left"></i> Voltar ao Início
-        </a>
+        <a href="../index.html" class="btn-back"><i class="fas fa-arrow-left"></i> Voltar ao Início</a>
     </header>
 
     <div class="container" id="content" style="display: none;">
@@ -68,17 +65,16 @@
         <div class="download-area">
             <h3>Download Abaixo</h3>
             <a href="#" id="gameLink" target="_blank" class="btn-mega-download">Baixar</a>
-            
-            <div class="vt-check-area">
+            <div class="vt-area">
                 Quer testar se o Jogo pode ser um vírus? <br>
-                Teste em <span onclick="abrirVerificacaoVT()">VirusTotal</span>
+                Teste em <span class="vt-link" onclick="abrirVerificacaoVT()">VirusTotal</span>
             </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="vtModal">
         <div class="modal-box">
-            <p>O link de download foi copiado. Deseja abrir o VirusTotal para verificar o ficheiro?</p>
+            <p>O link foi copiado. Deseja abrir o VirusTotal para verificar o arquivo?</p>
             <div class="modal-btns">
                 <button class="btn-modal btn-confirm" onclick="irParaVT()">Sim, abrir VirusTotal</button>
                 <button class="btn-modal btn-close" onclick="fecharVTModal()">Agora não</button>
