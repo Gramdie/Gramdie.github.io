@@ -1,117 +1,81 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+// 1. CONFIGURAÇÃO DA API
+// Substitua pelo link que você gerou no SheetDB
+const SHEETDB_URL = "https://sheetdb.io/api/v1/SUA_ID_AQUI"; 
 
-// 1. CONFIGURAÇÃO (Certifique-se de que a URL está exatamente assim)
-const SUPABASE_URL = 'https://vhybulaqcdunktgwxqbzn.supabase.co'; 
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoeWJ1bGFxY2R1a3Rnd3hxYnpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NDQyOTgsImV4cCI6MjA4NzAyMDI5OH0.5obZrq54mSh1R3JzJ_lKokVVw4Yp2oostUMQLXzzR0s'; 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const gamesContainer = document.getElementById('gamesContainer');
 
-let pagina = 0;
-const limite = 50;
-let carregando = false;
-
-// 2. GESTÃO DE TEMA (COOKIES)
-const setCookie = (n, v) => document.cookie = `${n}=${v};path=/;max-age=31536000`;
-const getCookie = (n) => document.cookie.match('(^|;) ?' + n + '=([^;]*)(;|$)')?.[2];
-
-function aplicarTema(tema) {
-    const isLight = tema === 'light';
-    document.body.classList.toggle('light-mode', isLight);
-    const icon = document.getElementById('themeIcon');
-    if (icon) icon.className = isLight ? 'fas fa-moon' : 'fas fa-sun';
-}
-
-// 3. RENDERIZAÇÃO DOS CARDS (Com verificação de ID)
-function renderizarCards(jogos) {
-    const grid = document.getElementById('games-grid');
-    if (!grid) return;
-
-    jogos.forEach(game => {
-        const desc = game.description || "";
-        const descCurta = desc.length > 90 ? desc.substring(0, 90) + "..." : desc;
-        const dataF = game.created_at ? new Date(game.created_at).toLocaleDateString('pt-BR') : "";
-
-        const card = document.createElement('div');
-        card.className = 'game-card';
-        
-        // CORREÇÃO: Só redireciona se o ID existir no banco
-        card.onclick = () => {
-            if (game.id) window.location.href = `pages/post.html?id=${game.id}`;
-        };
-
-        card.innerHTML = `
-            <img src="${game.banner || ''}" onerror="this.src='img/placeholder.jpg'">
-            <div class="card-content">
-                <div class="post-date">Postado em ${dataF}</div>
-                <h3 style="margin:0;">${game.title}</h3>
-                <p class="card-desc">${descCurta}</p>
-                <div class="genre-tags">
-                    ${(game.genres || "").split(',').map(g => `<span class="tag-genre">${g.trim()}</span>`).join('')}
-                </div>
-                <a href="${game.mainLink}" target="_blank" class="btn-download" onclick="event.stopPropagation()">Download</a>
-            </div>`;
-        grid.appendChild(card);
-    });
-}
-
-// 4. CARREGAMENTO DOS DADOS (Com tratamento de erro de rede)
+/**
+ * Função principal para buscar os jogos na Planilha Google via SheetDB
+ */
 async function buscarJogos() {
-    if (carregando) return;
-    carregando = true;
-
     try {
-        const { data, error } = await supabase
-            .from('posts')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .range(pagina * limite, (pagina + 1) * limite - 1);
+        console.log("Conectando ao SheetDB...");
+        
+        // Faz a chamada para a API
+        const response = await fetch(SHEETDB_URL);
+        
+        if (!response.ok) throw new Error("Não foi possível conectar à base de dados.");
 
-        if (error) throw error;
+        const jogos = await response.json();
 
-        if (data && data.length > 0) {
-            renderizarCards(data);
-            pagina++;
+        // Limpa o container (remove o texto "Carregando...")
+        gamesContainer.innerHTML = '';
+
+        if (jogos.length === 0) {
+            gamesContainer.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
+                    <p style="color: #888;">Nenhum jogo postado no repositório ainda.</p>
+                </div>`;
+            return;
         }
-    } catch (err) {
-        console.warn("Aguardando conexão com Supabase...");
-    } finally {
-        carregando = false;
-    }
-}
 
-// 5. INICIALIZAÇÃO "BLINDADA" (CORRIGE ERRO DE NULL)
-// Esta função garante que o JS só mexe nos botões após o HTML carregar
-const inicializar = () => {
-    aplicarTema(getCookie('theme') || 'dark');
+        // 2. RENDERIZAÇÃO DOS CARDS
+        // .reverse() serve para que o jogo mais recente (última linha da planilha) apareça primeiro
+        jogos.reverse().forEach(jogo => {
+            const card = document.createElement('div');
+            card.className = 'game-card';
+            
+            // Configura o clique para ir à página do post com o ID da planilha
+            card.onclick = () => {
+                window.location.href = `pages/post.html?id=${jogo.id}`;
+            };
 
-    const themeBtn = document.getElementById('themeBtn');
-    if (themeBtn) {
-        themeBtn.onclick = () => {
-            const novo = document.body.classList.contains('light-mode') ? 'dark' : 'light';
-            aplicarTema(novo);
-            setCookie('theme', novo);
-        };
-    }
-
-    const addBtn = document.getElementById('addGameBtn');
-    if (addBtn) {
-        addBtn.onclick = () => window.location.href = 'pages/creategame.html';
-    }
-
-    // Observer para Scroll Infinito
-    const sentinel = document.getElementById('loading-trigger');
-    if (sentinel) {
-        const obs = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting) buscarJogos();
+            // Monta a estrutura visual do card usando os nomes das colunas que você criou
+            card.innerHTML = `
+                <div class="banner-wrapper">
+                    <img src="${jogo.banner}" alt="${jogo.title}" class="game-banner" onerror="this.src='https://placehold.co/600x400?text=Sem+Imagem'">
+                </div>
+                <div class="game-details">
+                    <h3 class="game-title">${jogo.title}</h3>
+                    <p class="game-genres">
+                        <i class="fas fa-tags" style="font-size: 10px; color: #1e90ff;"></i> 
+                        ${jogo.genres}
+                    </p>
+                    <div class="game-footer">
+                        <span class="game-date">${jogo.date || 'Recém postado'}</span>
+                    </div>
+                </div>
+            `;
+            
+            gamesContainer.appendChild(card);
         });
-        obs.observe(sentinel);
+
+    } catch (err) {
+        console.error("Erro na lógica do index:", err);
+        
+        // Feedback visual de erro para o usuário
+        gamesContainer.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 40px; border: 1px dashed #444; border-radius: 10px;">
+                <i class="fas fa-exclamation-triangle" style="color: #ff4444; font-size: 30px; margin-bottom: 10px;"></i>
+                <p>Erro ao carregar repositório.</p>
+                <p style="font-size: 12px; color: #888;">Verifique se o seu DNS ou navegador está bloqueando a API.</p>
+                <button onclick="location.reload()" style="margin-top: 15px; padding: 8px 20px; background: #1e90ff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    Tentar Novamente
+                </button>
+            </div>
+        `;
     }
-
-    buscarJogos();
-};
-
-// Executa a inicialização
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', inicializar);
-} else {
-    inicializar();
 }
+
+// Inicializa a função ao carregar a página
+document.addEventListener('DOMContentLoaded', buscarJogos);
