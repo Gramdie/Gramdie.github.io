@@ -1,8 +1,7 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-// Verifique se a URL não tem espaços invisíveis
-const SUPABASE_URL = 'https://vhybulaqcdunktgwxqbzn.supabase.co'; 
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoeWJ1bGFxY2R1a3Rnd3hxYnpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0NDQyOTgsImV4cCI6MjA4NzAyMDI5OH0.5obZrq54mSh1R3JzJ_lKokVVw4Yp2oostUMQLXzzR0s'; 
+const SUPABASE_URL = 'https://vhybulaqcdunktgwxqbzn.supabase.co';
+const SUPABASE_KEY = 'SUA_CHAVE_ANON_AQUI';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const form = document.getElementById('createGameForm');
@@ -34,23 +33,28 @@ if (form) {
 
             if (error) throw error;
 
-            // --- NOTIFICAÇÃO DE SUCESSO ---
+            // Lógica de notificação solicitada
             const postId = data[0].id;
-            const msg = "Jogo publicado com sucesso!\n\nOK: Ver a página do jogo\nCANCELAR: Voltar para o início";
+            const msg = "Publicação concluída!\n\nOK: Ver a página do jogo\nCANCELAR: Voltar ao início";
             
             if (confirm(msg)) {
-                // Direciona para a página do post (mesma pasta)
                 window.location.href = `post.html?id=${postId}`;
             } else {
-                // Volta para a raiz
                 window.location.href = '../index.html';
             }
 
         } catch (err) {
-            console.error("Erro de rede detectado:", err);
-            alert("Erro de Conexão: O servidor não respondeu. Se você usa o Brave, desative o 'Shield' ou verifique o seu DNS.");
+            // Captura o erro da linha 50
+            console.error("Erro detalhado capturado:", err);
+            
+            if (err.message === "Failed to fetch") {
+                alert("Erro de Conexão: O navegador não conseguiu falar com o servidor. Desative o 'Shield' do Brave (ícone do leão) para este site.");
+            } else {
+                alert("Erro ao publicar: " + err.message);
+            }
+            
             submitBtn.disabled = false;
-            submitBtn.innerText = "Tentar Novamente";
+            submitBtn.innerText = "Publicar Jogo";
         }
     };
 }
