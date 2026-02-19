@@ -3,127 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Postar Jogo | Gramdie</title>
+    <title>Postar Novo Jogo - Gramdie Games</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&display=swap" rel="stylesheet">
-    <style>
-        :root { 
-            --bg: #1C1C1C; 
-            --card: #262626; 
-            --blue: #1E90FF; 
-            --txt: #ffffff; 
-            --gray: #888888;
+    <link rel="stylesheet" href="../css/create-style.css"> <style>
+        :root {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --blue: #1e90ff;
+            --text: #ffffff;
         }
-
-        body { 
-            background: var(--bg); 
-            color: var(--txt); 
-            font-family: 'Inclusive Sans', sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            padding: 40px 20px; 
-            margin: 0; 
-        }
-        
-        .form-container { 
-            background: var(--card); 
-            padding: 40px; 
-            border-radius: 24px; 
-            width: 100%; 
-            max-width: 650px; 
-            border: 1px solid #333; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-        }
-
-        h2 { margin-top: 0; color: var(--blue); font-size: 28px; }
-        p.subtitle { color: var(--gray); margin-bottom: 30px; font-size: 14px; }
-        
-        .field-group { margin-bottom: 22px; }
-        
-        label { 
-            display: block; 
-            margin-bottom: 8px; 
-            font-size: 14px; 
-            font-weight: bold; 
-            color: var(--blue); 
-        }
-        
+        body { background: var(--bg); color: var(--text); font-family: 'Inclusive Sans', sans-serif; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 15px; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #888; }
         input, textarea { 
-            width: 100%; 
-            padding: 14px; 
-            border-radius: 12px; 
-            border: 1px solid #444; 
-            background: #111; 
-            color: white; 
-            box-sizing: border-box; 
-            font-family: inherit; 
-            font-size: 15px; 
-            outline: none; 
-            transition: border-color 0.3s;
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; 
+            background: #000; color: #fff; box-sizing: border-box; font-family: inherit;
         }
-
-        input:focus, textarea:focus { border-color: var(--blue); }
-        
+        .genre-grid { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
+            gap: 10px; background: #000; padding: 15px; border-radius: 8px; border: 1px solid #333;
+        }
+        .genre-option { font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
         .btn-post { 
-            background: var(--blue); 
-            color: white; 
-            border: none; 
-            padding: 20px; 
-            width: 100%; 
-            border-radius: 15px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            margin-top: 20px; 
-            font-size: 18px; 
-            transition: 0.3s;
+            width: 100%; background: var(--blue); color: white; border: none; padding: 15px; 
+            border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px;
         }
-
-        .btn-post:hover { filter: brightness(1.2); transform: translateY(-2px); }
-        .btn-post:disabled { background: #444; cursor: not-allowed; opacity: 0.6; transform: none; }
-
-        #status { 
-            margin-top: 20px; 
-            text-align: center; 
-            font-size: 14px; 
-            display: none; 
-            padding: 10px;
-            border-radius: 8px;
-        }
+        .btn-post:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
-    <div class="form-container">
-        <h2>Postar Jogo Anônimo</h2>
-        <p class="subtitle">Seu jogo será armazenado de forma segura no banco de dados Supabase.</p>
+    <div class="container">
+        <a href="../index.html" style="color: var(--blue); text-decoration: none;"><i class="fas fa-arrow-left"></i> Voltar</a>
+        <h2 style="margin-top: 20px;">Publicar no Repositório</h2>
         
-        <div class="field-group">
-            <label>Banner do Jogo (URL da Imagem)</label>
-            <input type="url" id="banner" placeholder="Ex: https://i.imgur.com/link.png">
+        <div class="input-group">
+            <label>Título do Jogo</label>
+            <input type="text" id="gameTitle" placeholder="Ex: Elden Ring">
         </div>
 
-        <div class="field-group">
-            <label>Título (Até 40 caracteres)</label>
-            <input type="text" id="title" maxlength="40" placeholder="Nome do Jogo" required>
+        <div class="input-group">
+            <label>URL do Banner (Imagem)</label>
+            <input type="url" id="gameBanner" placeholder="https://linkdaimagem.com/foto.jpg">
         </div>
 
-        <div class="field-group">
-            <label>Descrição (Até 1200 caracteres)</label>
-            <textarea id="desc" rows="4" maxlength="1200" placeholder="Fale sobre o jogo, requisitos, etc..."></textarea>
+        <div class="input-group">
+            <label>Descrição</label>
+            <textarea id="gameDesc" rows="5" placeholder="Escreva os detalhes do jogo..."></textarea>
         </div>
 
-        <div class="field-group">
-            <label>Link de Download (MEGA, Drive, Mediafire...)</label>
-            <input type="url" id="mainLink" placeholder="Link completo do arquivo" required>
+        <div class="input-group">
+            <label>Gêneros (Selecione até 4)</label>
+            <div class="genre-grid" id="genreContainer">
+                </div>
         </div>
 
-        <div class="field-group">
-            <label>Nome do Autor (Opcional)</label>
-            <input type="text" id="author" placeholder="Deixe vazio para gerar ID aleatório">
+        <div class="input-group">
+            <label>Link de Download Principal</label>
+            <input type="url" id="gameLink" placeholder="Mediafire, Mega, Google Drive...">
         </div>
 
-        <button class="btn-post" id="btnSubmit">Publicar na Nuvem</button>
-        
-        <div id="status"></div>
+        <button class="btn-post" id="btnPublish">Publicar Jogo</button>
     </div>
 
     <script type="module" src="../js/postgame.js"></script>
