@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suporte - Gramdie Games</title>
+    <title>Suporte e Guia - Gramdie Games</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&display=swap" rel="stylesheet">
     <style>
@@ -14,8 +14,8 @@
             --text-gray: #888888;
             --blue: #1e90ff;
             --red: #ff4757;
-            --green: #2ecc71;
             --border: #2a2a2a;
+            --input-bg: #252525;
         }
 
         body.light-mode {
@@ -62,7 +62,6 @@
 
         .container { padding: 40px 5%; max-width: 1000px; margin: 0 auto; }
 
-        /* Estilo de Blocos / Mapa Mental */
         .support-section { margin-bottom: 50px; }
         .section-title { 
             font-size: 22px; 
@@ -73,139 +72,128 @@
             color: var(--blue);
         }
 
-        .support-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
         .info-card {
             background: var(--card-bg);
             padding: 25px;
             border-radius: 15px;
             border: 1px solid var(--border);
-            transition: 0.3s;
+            margin-bottom: 20px;
         }
 
-        .info-card h3 { margin-top: 0; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+        .info-card h3 { margin-top: 0; font-size: 18px; color: var(--blue); }
         .info-card p { font-size: 14px; color: var(--text-gray); }
 
-        /* Área de Denúncia - Texto Vermelho */
-        .denuncia-box {
-            border: 2px solid rgba(255, 71, 87, 0.3);
-            background: rgba(255, 71, 87, 0.05);
+        /* Guia de Uso */
+        .guide-step { margin-bottom: 20px; padding-left: 15px; border-left: 2px solid var(--blue); }
+        .guide-step b { color: var(--text-main); display: block; margin-bottom: 5px; }
+
+        /* Contatos */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
         }
+        .contact-item {
+            background: var(--input-bg);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            transition: 0.2s;
+        }
+        .contact-item:hover { border-color: var(--blue); transform: translateY(-3px); }
+        .contact-item i { font-size: 24px; margin-bottom: 10px; display: block; }
+        .contact-item span { font-size: 12px; color: var(--text-gray); display: block; }
+
+        /* Denúncia Red */
+        .denuncia-box { border: 2px solid var(--red); background: rgba(255, 71, 87, 0.05); }
         .denuncia-box h3 { color: var(--red); }
-        .red-highlight { color: var(--red); font-weight: bold; }
-        
-        .path-step {
-            background: #000;
-            padding: 10px;
-            border-radius: 8px;
-            display: block;
-            margin: 15px 0;
-            font-family: monospace;
-            font-size: 14px;
-        }
+        .red-text { color: var(--red); font-weight: bold; }
 
-        /* Lista de Detalhes do Site */
-        .detail-list { list-style: none; padding: 0; margin: 0; }
-        .detail-list li { 
-            padding: 10px 0; 
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-            display: flex;
-            justify-content: space-between;
-        }
-        .detail-list li span { color: var(--text-gray); }
-
-        .btn-contact {
+        .btn-mail {
             display: inline-block;
-            margin-top: 15px;
-            padding: 10px 20px;
-            background: var(--blue);
+            margin: 5px;
+            padding: 8px 15px;
+            background: #444;
             color: white;
             text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 14px;
+            border-radius: 6px;
+            font-size: 12px;
         }
-
-        .btn-red { background: var(--red); }
-
+        .btn-mail:hover { background: var(--blue); }
     </style>
 </head>
 <body>
 
     <header>
         <a href="../index.html" class="btn-back"><i class="fas fa-arrow-left"></i></a>
-        <h1 style="font-size: 20px; margin: 0;">Central de Ajuda & Detalhes</h1>
+        <h1 style="font-size: 20px; margin: 0;">Central de Ajuda e Guia</h1>
     </header>
 
     <div class="container">
 
         <div class="support-section">
-            <div class="section-title"><i class="fas fa-info-circle"></i> Sobre o Gramdie Games</div>
-            <div class="support-grid">
-                <div class="info-card">
-                    <h3>Funcionamento</h3>
-                    <p>O Gramdie Games é um indexador de links. Nós organizamos jogos e softwares úteis de forma limpa, sem anúncios abusivos.</p>
-                    <ul class="detail-list">
-                        <li>Versão do Site <span>1.0.4 (Beta)</span></li>
-                        <li>Banco de Dados <span>SheetDB API</span></li>
-                        <li>Atualizações <span>Diárias</span></li>
-                    </ul>
+            <div class="section-title"><i class="fas fa-book"></i> Como usar a Gramdie Games</div>
+            <div class="info-card">
+                <div class="guide-step">
+                    <b>1. Localizando Jogos</b>
+                    <p>Use a barra de pesquisa no topo para buscar por nomes. Você também pode clicar em "Filtrar" para abrir a busca detalhada, onde pode pesquisar por IDs únicos, datas específicas ou palavras contidas na descrição.</p>
                 </div>
-                <div class="info-card">
-                    <h3>Tecnologias</h3>
-                    <p>Utilizamos tecnologias modernas para garantir que sua busca seja rápida e o consumo de dados seja baixo.</p>
-                    <ul class="detail-list">
-                        <li>Linguagem <span>HTML5 / JS ES6</span></li>
-                        <li>Ícones <span>FontAwesome 6</span></li>
-                        <li>Estética <span>Inclusive Sans</span></li>
-                    </ul>
+                <div class="guide-step">
+                    <b>2. O Sistema de Tags (#)</b>
+                    <p>Nossa plataforma usa um sistema de tags para categorias. Digite <b>#</b> na busca seguido do gênero (ex: #Action, #Erotic, #RPG) para listar todos os jogos daquela categoria.</p>
+                </div>
+                <div class="guide-step">
+                    <b>3. Identificando Provedores</b>
+                    <p>Nos cards de jogos, exibimos o ícone de nuvem que indica onde o arquivo está hospedado (Mediafire, Mega, etc). Isso ajuda você a escolher seu servidor de preferência antes de clicar.</p>
+                </div>
+                <div class="guide-step">
+                    <b>4. Modo Escuro/Claro</b>
+                    <p>No canto superior direito, o ícone de sol/lua permite alternar o tema do site. Suas preferências ficam salvas para as próximas visitas.</p>
                 </div>
             </div>
         </div>
 
         <div class="support-section">
-            <div class="section-title" style="color: var(--red);"><i class="fas fa-exclamation-triangle"></i> Segurança e Integridade</div>
-            <div class="info-card denuncia-box" style="width: 100%; box-sizing: border-box;">
-                <h3>Proibição de Softwares Mal Intencionados</h3>
-                <p>Nossa prioridade é a segurança da comunidade. É terminantemente proibido postar vírus ou qualquer script que prejudique o usuário.</p>
-                <p>Caso encontre algo suspeito, você deve realizar a denúncia imediatamente seguindo este fluxo exato:</p>
-                
-                <code class="path-step">
-                    Clique em <span class="red-highlight">Denunciar</span> > Selecione o Motivo > <span class="red-highlight">Software mal intencionado</span>
-                </code>
-
-                <p style="margin-bottom: 0;">O desenvolvedor do site não possui vínculo legal com os arquivos postados por terceiros, mas agimos rapidamente para remover conteúdos nocivos denunciados.</p>
-                <a href="https://discord.gg/SNbNbUq8hu" class="btn-contact btn-red">Abrir Ticket de Denúncia</a>
+            <div class="section-title"><i class="fas fa-envelope"></i> Contatos e Sugestões</div>
+            <p style="font-size: 14px; color: var(--text-gray); margin-bottom: 20px;">Use os canais abaixo para enviar sugestões de melhoria, parcerias ou relatar problemas técnicos no site.</p>
+            <div class="contact-grid">
+                <a href="https://discord.gg/SNbNbUq8hu" target="_blank" class="contact-item">
+                    <i class="fab fa-discord" style="color: #5865F2;"></i>
+                    <b>Discord Oficial</b>
+                    <span>Canal de suporte e sugestões</span>
+                </a>
+                <div class="contact-item">
+                    <i class="fas fa-at" style="color: var(--blue);"></i>
+                    <b>E-mail de Suporte</b>
+                    <span>GramdieSuporte@hotmail.com</span>
+                    <div style="margin-top: 10px;">
+                        <a href="https://outlook.live.com/mail/0/deeplink/compose?to=GramdieSuporte@hotmail.com" target="_blank" class="btn-mail">Abrir no Outlook</a>
+                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=GramdieSuporte@hotmail.com" target="_blank" class="btn-mail">Abrir no Gmail</a>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="support-section">
-            <div class="section-title"><i class="fas fa-question-circle"></i> FAQ (Dúvidas Comuns)</div>
-            <div class="support-grid">
-                <div class="info-card">
-                    <h3>O link está fora do ar?</h3>
-                    <p>Links podem expirar nos servidores de nuvem. Use o botão de suporte para nos avisar e faremos o reupload o mais rápido possível.</p>
+            <div class="section-title" style="color: var(--red);"><i class="fas fa-shield-alt"></i> Denunciar Software</div>
+            <div class="info-card denuncia-box">
+                <h3>Segurança em Primeiro Lugar</h3>
+                <p>Nossa plataforma tem tolerância zero para vírus ou malwares. Se você baixou algo e detectou comportamento suspeito, reporte imediatamente para protegermos outros usuários.</p>
+                <p><b>Como denunciar:</b></p>
+                <div style="background: #000; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 13px; margin: 10px 0;">
+                    Caminho: <span class="red-text">Denunciar</span> > Motivo > Software mal intencionado
                 </div>
-                <div class="info-card">
-                    <h3>Como usar as Tags?</h3>
-                    <p>Na barra de pesquisa, use o símbolo <b>#</b> antes da categoria (ex: #RPG). Isso filtra instantaneamente o catálogo por gênero.</p>
-                </div>
-                <div class="info-card">
-                    <h3>Pedido de Jogos</h3>
-                    <p>Quer um jogo específico que não está aqui? Entre no nosso Discord e deixe sua sugestão no canal de pedidos.</p>
-                </div>
+                <p>Ao enviar o e-mail ou abrir o ticket no Discord, por favor, informe o <b>ID do jogo</b> ou o <b>Título exato</b> para que nossa equipe remova o post imediatamente após a verificação.</p>
+                <a href="https://discord.gg/SNbNbUq8hu" class="btn-contact" style="background: var(--red); color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; display: inline-block; font-weight: bold;">Denunciar via Discord</a>
             </div>
         </div>
 
     </div>
 
     <script>
-        // Mantém o tema sincronizado com o resto do site
         if (localStorage.getItem('theme') === 'light') {
             document.body.classList.add('light-mode');
         }
