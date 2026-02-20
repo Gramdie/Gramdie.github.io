@@ -1,12 +1,11 @@
 const SHEETDB_URL = "https://sheetdb.io/api/v1/9sv7pjhrhpwbq";
 
-// Seletores
 const gamesGrid = document.getElementById('games-grid');
 const loadingTrigger = document.getElementById('loading-trigger');
 const themeBtn = document.getElementById('themeBtn');
 const addGameBtn = document.getElementById('addGameBtn');
 
-// --- LÓGICA DO TEMA ---
+// --- TEMA ---
 if (themeBtn) {
     themeBtn.onclick = () => {
         document.body.classList.toggle('light-mode');
@@ -22,19 +21,17 @@ if (localStorage.getItem('theme') === 'light') {
     if (icon) icon.className = 'fas fa-moon';
 }
 
-// --- LÓGICA DO BOTÃO ADICIONAR ---
+// --- BOTÃO ADICIONAR ---
 if (addGameBtn) {
     addGameBtn.onclick = () => {
         window.location.href = 'pages/creategame.html'; 
     };
 }
 
-// --- FUNÇÃO DE CARREGAMENTO DOS JOGOS ---
+// --- RENDERIZAÇÃO ---
 async function carregarJogos() {
     try {
         const response = await fetch(SHEETDB_URL);
-        if (!response.ok) throw new Error("Erro de conexão");
-
         const data = await response.json();
 
         if (loadingTrigger) loadingTrigger.style.display = 'none';
@@ -45,31 +42,27 @@ async function carregarJogos() {
         [...data].reverse().forEach(jogo => {
             const card = document.createElement('div');
             card.className = 'game-card';
-            
-            // Redirecionamento para o post
-            card.onclick = () => {
-                window.location.href = `pages/post.html?id=${jogo.id}`;
-            };
+            card.onclick = () => window.location.href = `pages/post.html?id=${jogo.id}`;
 
-            // Processamento das tags de gênero
-            const generosRaw = jogo.genres || "Geral";
-            const tagsHTML = generosRaw.split(',')
+            // Fallback para colunas que faltam na planilha
+            const desc = jogo.description || "Descrição ainda não adicionada na planilha.";
+            const generos = jogo.genres || "Geral";
+            
+            const tagsHTML = generos.split(',')
                 .map(g => `<span class="tag-genre">${g.trim()}</span>`)
                 .join('');
 
-            // Identificação do provedor baseado no link
-            const link = jogo.mainLink || "";
-            const providerName = link.includes('mediafire') ? 'Mediafire' : 'Cloud Store';
+            const provider = (jogo.mainLink || "").includes('mediafire') ? 'Mediafire' : 'Cloud Store';
 
             card.innerHTML = `
-                <img src="${jogo.banner}" alt="${jogo.title}" onerror="this.src='https://placehold.co/600x400?text=Imagem+Indisponivel'">
+                <img src="${jogo.banner}" alt="${jogo.title}" onerror="this.src='https://placehold.co/600x400?text=Sem+Imagem'">
                 <div class="card-content">
-                    <span class="post-date">${jogo.date || 'Disponível'}</span>
-                    <h3 class="game-title">${jogo.title || 'Sem Título'}</h3>
-                    <p class="card-desc">${jogo.description || 'Nenhuma descrição fornecida para este jogo.'}</p>
+                    <span class="post-date">${jogo.date || 'Recente'}</span>
+                    <h3 class="game-title">${jogo.title || 'Título Indisponível'}</h3>
+                    <p class="card-desc">${desc}</p>
                     <div class="genre-tags">${tagsHTML}</div>
                     <div class="provider-tags">
-                        <span class="tag-provider"><i class="fas fa-cloud"></i> ${providerName}</span>
+                        <span class="tag-provider"><i class="fas fa-cloud"></i> ${provider}</span>
                         <span class="status-online">● Online</span>
                     </div>
                     <div class="btn-download">Ver Detalhes</div>
@@ -77,10 +70,8 @@ async function carregarJogos() {
             `;
             gamesGrid.appendChild(card);
         });
-
     } catch (err) {
-        console.error("Erro ao listar jogos:", err);
-        if (loadingTrigger) loadingTrigger.innerHTML = "Erro ao carregar o catálogo.";
+        if (loadingTrigger) loadingTrigger.innerHTML = "Erro ao conectar com o banco de dados.";
     }
 }
 
