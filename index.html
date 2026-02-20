@@ -1,186 +1,137 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gramdie Games</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg: #121212;
-            --header-border: #2a2a2a;
-            --card-bg: #1e1e1e;
-            --text-main: #ffffff;
-            --text-gray: #888888;
-            --blue: #1e90ff;
-            --search-bg: #1e1e1e;
+const SHEETDB_URL = "https://sheetdb.io/api/v1/9sv7pjhrhpwbq";
+
+// Seleção de elementos do DOM
+const gamesGrid = document.getElementById('games-grid');
+const loadingTrigger = document.getElementById('loading-trigger');
+const themeBtn = document.getElementById('themeBtn');
+const themeIcon = document.getElementById('themeIcon');
+const addGameBtn = document.getElementById('addGameBtn');
+const searchInput = document.getElementById('searchInput');
+
+// --- 1. LÓGICA DE TEMA (DARK/LIGHT) ---
+function aplicarTema() {
+    const temaSalvo = localStorage.getItem('theme');
+    if (temaSalvo === 'light') {
+        document.body.classList.add('light-mode');
+        if (themeIcon) themeIcon.className = 'fas fa-moon';
+    }
+}
+
+if (themeBtn) {
+    themeBtn.onclick = () => {
+        document.body.classList.toggle('light-mode');
+        const isLight = document.body.classList.contains('light-mode');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        if (themeIcon) themeIcon.className = isLight ? 'fas fa-moon' : 'fas fa-sun';
+    };
+}
+
+// --- 2. LÓGICA DE BUSCA (REDIRECIONAMENTO) ---
+if (searchInput) {
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const valor = searchInput.value.trim();
+            if (valor) {
+                window.location.href = `pages/search.html?query=${encodeURIComponent(valor)}`;
+            }
         }
+    });
+}
 
-        body.light-mode {
-            --bg: #ffffff;
-            --header-border: #eeeeee;
-            --card-bg: #f9f9f9;
-            --text-main: #121212;
-            --text-gray: #666666;
-            --blue: #007bff;
-            --search-bg: #f0f0f0;
-        }
+// --- 3. BOTÃO ADICIONAR ---
+if (addGameBtn) {
+    addGameBtn.onclick = () => {
+        window.location.href = 'pages/creategame.html';
+    };
+}
 
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: 'Inclusive Sans', sans-serif;
-            margin: 0;
-            transition: 0.3s;
-            overflow-x: hidden;
-        }
-
-        /* --- HEADER --- */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 5%;
-            border-bottom: 1px solid var(--header-border);
-            position: sticky;
-            top: 0;
-            background: var(--bg);
-            z-index: 1000;
-        }
-
-        .logo-area { display: flex; align-items: baseline; cursor: pointer; }
-        .logo-area h1 { font-size: 24px; margin: 0; letter-spacing: -1px; }
-        .logo-area span { color: var(--blue); font-size: 16px; margin-left: 5px; font-weight: bold; }
-
-        .search-container { flex: 1; max-width: 350px; margin: 0 20px; }
-        .search-box {
-            display: flex;
-            align-items: center;
-            background: var(--search-bg);
-            padding: 8px 15px;
-            border-radius: 20px;
-            border: 1px solid var(--header-border);
-            transition: 0.2s;
-        }
-        .search-box:focus-within { border-color: var(--blue); }
-        .search-box input {
-            background: none; border: none; color: var(--text-main);
-            margin-left: 10px; outline: none; width: 100%; font-family: inherit;
-        }
-
-        /* --- AÇÕES E BOTÕES --- */
-        .nav-actions { display: flex; gap: 10px; align-items: center; }
-
-        .btn-text {
-            color: var(--text-main);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: bold;
-            padding: 8px 12px;
-            border-radius: 8px;
-            transition: 0.2s;
-        }
-        .btn-text:hover { background: rgba(30, 144, 255, 0.1); color: var(--blue); }
-
-        .btn-circle {
-            width: 40px; height: 40px; border-radius: 50%; border: none;
-            background: var(--card-bg); color: var(--text-main); cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: 0.2s; text-decoration: none; font-size: 16px;
-        }
-        .btn-circle:hover { transform: scale(1.1); filter: brightness(1.2); }
-
-        /* --- CONTEÚDO --- */
-        .container { padding: 40px 5%; }
+// --- 4. RENDERIZAÇÃO DOS CARDS DO BANCO DE DADOS ---
+async function carregarCatalogo() {
+    try {
+        const response = await fetch(SHEETDB_URL);
+        if (!response.ok) throw new Error("Erro na rede");
         
-        #games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-        }
+        const data = await response.json();
 
-        /* --- CARDS --- */
-        .game-card {
-            background: var(--card-bg); border-radius: 15px; overflow: hidden;
-            transition: 0.3s; border: 1px solid transparent; cursor: pointer;
-            display: flex; flex-direction: column; height: 100%;
-        }
-        .game-card:hover { border-color: #444; transform: translateY(-5px); }
-        .game-card img { width: 100%; height: 170px; object-fit: cover; background: #222; }
+        // Esconde o loading
+        if (loadingTrigger) loadingTrigger.style.display = 'none';
+        if (!gamesGrid) return;
 
-        .card-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
-        .post-date { font-size: 11px; color: var(--text-gray); margin-bottom: 5px; }
-        .game-title { font-size: 19px; margin: 0; font-weight: bold; color: var(--text-main); }
-        .card-desc { font-size: 14px; color: var(--text-gray); margin: 12px 0; line-height: 1.5; flex-grow: 1; }
-        
-        .genre-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 15px; }
-        .tag-genre { font-size: 10px; padding: 4px 10px; border-radius: 5px; background: rgba(255,255,255,0.05); color: #ccc; }
+        gamesGrid.innerHTML = '';
 
-        .provider-tags { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-        .tag-provider { font-size: 11px; color: var(--blue); font-weight: bold; display: flex; align-items: center; gap: 5px; }
-
-        .btn-details {
-            background: var(--blue); color: white; padding: 12px; border-radius: 10px;
-            text-decoration: none; font-weight: bold; text-align: center;
-            transition: 0.2s; font-size: 14px;
-        }
-        .btn-details:hover { opacity: 0.9; }
-
-        /* --- FEEDBACK --- */
-        #loading-trigger { 
-            text-align: center; padding: 60px; color: var(--text-gray); 
-            grid-column: 1 / -1; width: 100%;
-        }
-        .fa-spin { margin-bottom: 10px; font-size: 24px; color: var(--blue); }
-    </style>
-</head>
-<body>
-
-    <header>
-        <div class="logo-area" onclick="window.location.href='index.html'">
-            <h1>Gramdie</h1><span>Games</span>
-        </div>
-
-        <div class="search-container">
-            <div class="search-box">
-                <i class="fas fa-search" style="color: var(--text-gray);"></i>
-                <input type="text" id="searchInput" placeholder="Nome, #tag ou ID...">
-            </div>
-        </div>
-
-        <div class="nav-actions">
-            <a href="pages/filter.html" class="btn-text">Filtrar</a>
-            <a href="pages/terms.html" class="btn-text">Termos</a>
-
-            <a href="https://discord.gg/SNbNbUq8hu" target="_blank" class="btn-circle" style="background: #5865F2;">
-                <i class="fab fa-discord" style="color: white;"></i>
-            </a>
+        // Exibe do mais novo para o mais antigo
+        [...data].reverse().forEach(jogo => {
+            const card = document.createElement('div');
+            card.className = 'game-card';
             
-            <a href="pages/suport.html" class="btn-circle" style="background: #ff4757;">
-                <i class="fas fa-headset" style="color: white;"></i>
-            </a>
+            // Redirecionamento para a página do post
+            card.onclick = () => {
+                window.location.href = `pages/post.html?id=${jogo.id}`;
+            };
 
-            <button class="btn-circle" id="addGameBtn" title="Adicionar Jogo">
-                <i class="fas fa-plus"></i>
-            </button>
+            // Processamento de Gêneros
+            const generosRaw = jogo.genres || "Geral";
+            const tagsHTML = generosRaw.split(',')
+                .map(g => `<span class="tag-genre">${g.trim()}</span>`)
+                .join('');
 
-            <button class="btn-circle" id="themeBtn">
-                <i class="fas fa-sun" id="themeIcon"></i>
-            </button>
-        </div>
-    </header>
+            // Identificação do Provedor
+            const linkDownload = (jogo.mainLink || "").toLowerCase();
+            let provedorNome = "Cloud Store";
+            if (linkDownload.includes('mediafire')) provedorNome = "Mediafire";
+            if (linkDownload.includes('mega.nz')) provedorNome = "Mega.nz";
+            if (linkDownload.includes('drive.google')) provedorNome = "Google Drive";
 
-    <div class="container">
-        <div id="games-grid">
-            <div id="loading-trigger">
-                <i class="fas fa-circle-notch fa-spin"></i>
-                <p>Sincronizando com o banco de dados...</p>
-            </div>
-        </div>
-    </div>
+            // --- LÓGICA DA TAG SUSPICIOUS ---
+            // Se a coluna 'suspicious' for "true" ou "1", cria a tag vermelha
+            let tagSuspicious = "";
+            if (jogo.suspicious === "true" || jogo.suspicious === "1") {
+                tagSuspicious = `
+                    <div style="background: #ff4757; color: white; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 6px; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 5px rgba(255,71,87,0.3);">
+                        <i class="fas fa-exclamation-triangle"></i> SUSPICIOUS
+                    </div>
+                `;
+            }
 
-    <script src="js/indexlogic.js"></script>
-</body>
-</html>
+            card.innerHTML = `
+                <img src="${jogo.banner}" alt="${jogo.title}" onerror="this.src='https://placehold.co/600x400?text=Imagem+Indisponível'">
+                <div class="card-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span class="post-date">${jogo.date || 'Recente'}</span>
+                        ${tagSuspicious}
+                    </div>
+                    <h3 class="game-title">${jogo.title || 'Título Indisponível'}</h3>
+                    <p class="card-desc">${jogo.description || 'Nenhuma descrição disponível para este jogo.'}</p>
+                    <div class="genre-tags">${tagsHTML}</div>
+                    <div class="provider-tags">
+                        <span class="tag-provider">
+                            <i class="fas fa-cloud"></i> ${provedorNome}
+                        </span>
+                        <span class="tag-provider" style="color: #2ecc71;">
+                            <i class="fas fa-check-circle"></i> Online
+                        </span>
+                    </div>
+                    <div class="btn-details" style="background: var(--blue); color: white; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 14px; margin-top: auto;">
+                        Ver Detalhes
+                    </div>
+                </div>
+            `;
+            gamesGrid.appendChild(card);
+        });
+
+    } catch (err) {
+        console.error("Erro ao carregar jogos:", err);
+        if (loadingTrigger) {
+            loadingTrigger.innerHTML = `
+                <i class="fas fa-exclamation-circle" style="color: #ff4757; font-size: 24px;"></i>
+                <p>Erro ao sincronizar dados. Verifique sua conexão.</p>
+            `;
+        }
+    }
+}
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+    aplicarTema();
+    carregarCatalogo();
+});
