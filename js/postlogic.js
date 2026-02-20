@@ -1,43 +1,67 @@
-// js/security.js
+const SHEETDB_URL = "https://sheetdb.io/api/v1/9sv7pjhrhpwbq";
 
-window.abrirVerificacaoVT = () => {
-    // Busca a variável global definida no outro arquivo
-    const link = window.linkDownloadAtual;
+// Variavel global para armazenar o link com seguranca
+window.linkDownloadAtual = "";
 
-    if (!link || link === "") {
-        console.log("Aguardando carregamento do link de download");
+async function carregarPost() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+
+    // Se nao houver ID na URL, volta para a home
+    if (!id) {
+        window.location.href = '../index.html';
         return;
     }
 
-    // Copia para a área de transferência
-    navigator.clipboard.writeText(link).then(() => {
-        const ocultar = localStorage.getItem('pularAvisoVT');
+    try {
+        const res = await fetch(`${SHEETDB_URL}/search?id=${id}`);
+        const data = await res.json();
         
-        if (ocultar === 'true') {
-            window.open('https://www.virustotal.com/gui/home/url', '_blank');
-        } else {
-            const modal = document.getElementById('vtModal');
-            if (modal) modal.style.display = 'flex';
+        if (!data || data.length === 0) {
+            console.log("Jogo nao encontrado no banco de dados");
+            return;
         }
-    });
-};
 
-window.fecharVTModal = () => {
-    salvarEscolha();
-    const modal = document.getElementById('vtModal');
-    if (modal) modal.style.display = 'none';
-};
+        const jogo = data[0];
+        
+        // Define o link global assim que os dados chegam
+        window.linkDownloadAtual = jogo.mainLink || "";
 
-window.irParaVT = () => {
-    salvarEscolha();
-    window.open('https://www.virustotal.com/gui/home/url', '_blank');
-    const modal = document.getElementById('vtModal');
-    if (modal) modal.style.display = 'none';
-};
+        // Elementos do DOM
+        const titulo = document.getElementById('gameTitle');
+        const banner = document.getElementById('gameBanner');
+        const desc = document.getElementById('gameDesc');
+        const dataPost = document.getElementById('postDate');
+        const linkBtn = document.getElementById('gameLink');
+        const loading = document.getElementById('loading');
+        const content = document.getElementById('content');
 
-function salvarEscolha() {
-    const check = document.getElementById('dontShowVT');
-    if (check && check.checked) {
-        localStorage.setItem('pularAvisoVT', 'true');
+        // Preenchimento com verificacao para evitar erro 'null' ou 'undefined'
+        if (titulo) titulo.innerText = jogo.title || "Titulo indisponivel";
+        if (banner) banner.src = jogo.banner || "";
+        if (desc) desc.innerText = jogo.description || "Sem descricao disponivel";
+        if (dataPost) dataPost.innerText = jogo.date || "Data nao informada";
+        
+        if (linkBtn) {
+            linkBtn.href = window.linkDownloadAtual;
+        }
+
+        // Renderizacao de generos
+        const genreBox = document.getElementById('gameGenres');
+        if (genreBox && jogo.genres) {
+            genreBox.innerHTML = jogo.genres.split(',')
+                .map(g => `<span class="genre-tag">${g.trim()}</span>`)
+                .join('');
+        }
+
+        // Finaliza o loading e mostra o conteudo
+        if (loading) loading.style.display = 'none';
+        if (content) content.style.display = 'block';
+
+    } catch (e) {
+        console.log("Erro ao conectar com a API do SheetDB");
     }
 }
+
+// Inicia a execucao apenas quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', carregarPost);
