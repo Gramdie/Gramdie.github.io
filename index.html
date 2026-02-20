@@ -37,94 +37,71 @@
 
         header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
             padding: 15px 5%;
+            background-color: var(--bg);
             border-bottom: 1px solid var(--header-border);
             position: sticky;
             top: 0;
-            background: var(--bg);
             z-index: 1000;
         }
 
-        .logo-area { display: flex; align-items: baseline; cursor: pointer; }
+        .logo-area { display: flex; align-items: center; cursor: pointer; gap: 5px; }
         .logo-area h1 { font-size: 24px; margin: 0; }
-        .logo-area span { color: var(--text-gray); font-size: 16px; margin-left: 8px; }
+        .logo-area span { color: var(--blue); font-weight: bold; }
 
-        /* Pesquisa */
-        .search-container {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 380px;
-        }
-
+        .search-container { flex: 1; max-width: 500px; margin: 0 20px; position: relative; }
         .search-box {
             display: flex;
             align-items: center;
             background: var(--search-bg);
-            padding: 8px 15px;
-            border-radius: 20px;
-            border: 1px solid var(--header-border);
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: 1px solid transparent;
         }
-
         .search-box input {
             background: none; border: none; color: var(--text-main);
-            margin-left: 10px; outline: none; width: 100%;
+            margin-left: 10px; width: 100%; outline: none;
         }
 
-        .search-results {
-            position: absolute; background: var(--card-bg); width: 100%;
-            border-radius: 12px; margin-top: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            display: none; max-height: 520px; overflow: hidden; border: 1px solid var(--header-border);
-        }
-
-        .result-item { display: flex; align-items: center; padding: 10px; cursor: pointer; }
-        .result-item:hover { background: var(--header-border); }
-        .result-item img { width: 35px; height: 35px; border-radius: 5px; margin-right: 12px; object-fit: cover; }
-
-        /* Botões */
-        .nav-actions { display: flex; gap: 10px; }
+        .nav-actions { display: flex; gap: 12px; align-items: center; }
         .btn-circle {
-            width: 40px; height: 40px; border-radius: 50%; border: none;
-            background: var(--blue); color: white; cursor: pointer;
+            width: 40px; height: 40px; border-radius: 50%;
+            border: none; background: var(--card-bg); color: var(--text-main);
             display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.2s; text-decoration: none;
         }
+        .btn-circle:hover { transform: scale(1.1); filter: brightness(1.2); }
 
-        /* Card de Jogo */
-        #games-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px; padding: 40px 5%;
+        .container { padding: 40px 5%; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
         }
 
         .game-card {
-            background: var(--card-bg); border-radius: 15px; overflow: hidden;
-            transition: 0.3s; border: 1px solid transparent; cursor: pointer;
-            display: flex; flex-direction: column;
+            background: var(--card-bg); border-radius: 20px; overflow: hidden;
+            transition: 0.3s; cursor: pointer; display: flex; flex-direction: column;
+            border: 1px solid rgba(255,255,255,0.05);
         }
-
-        .game-card:hover { border-color: #555; }
-        .game-card img { width: 100%; height: 165px; object-fit: cover; }
-
-        .card-content { padding: 18px; flex-grow: 1; display: flex; flex-direction: column; }
+        .game-card:hover { transform: translateY(-8px); }
+        .game-card img { width: 100%; height: 180px; object-fit: cover; }
+        .card-content { padding: 20px; flex: 1; display: flex; flex-direction: column; }
         
-        /* Nova Data e Gênero */
-        .post-date { font-size: 11px; color: var(--text-gray); margin-bottom: 5px; }
-        .card-desc { font-size: 14px; color: var(--text-main); margin: 5px 0 12px 0; min-height: 42px; opacity: 0.9; }
+        .post-date { font-size: 12px; color: var(--text-gray); margin-bottom: 8px; display: block; }
+        .card-desc { font-size: 14px; color: var(--text-gray); line-height: 1.5; margin: 10px 0; }
         
-        .genre-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
-        .tag-genre { font-size: 10px; padding: 2px 8px; border-radius: 4px; background: #333; color: #bbb; }
-
-        .provider-tags { display: flex; gap: 6px; margin-bottom: 15px; }
-        .tag-provider { font-size: 10px; color: var(--blue); font-weight: bold; text-transform: uppercase; }
+        .genre-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 15px; }
+        .tag-genre { background: rgba(30, 144, 255, 0.1); color: var(--blue); padding: 4px 10px; border-radius: 6px; font-size: 11px; }
 
         .btn-download {
             background: var(--blue); color: white; padding: 12px; border-radius: 10px;
-            text-decoration: none; font-weight: bold; text-align: center; width: 100%;
-            box-sizing: border-box; display: block; margin-top: auto;
+            font-weight: bold; text-align: center; margin-top: auto; display: block;
         }
 
-        #loading-trigger { height: 80px; display: flex; align-items: center; justify-content: center; color: var(--text-gray); }
+        #loading-trigger { text-align: center; padding: 50px; color: var(--text-gray); }
     </style>
 </head>
 <body>
@@ -137,36 +114,29 @@
         <div class="search-container">
             <div class="search-box">
                 <i class="fas fa-search" style="color: var(--text-gray);"></i>
-                <input type="text" id="searchInput" placeholder="Buscando...">
+                <input type="text" id="searchInput" placeholder="Buscando jogos...">
             </div>
-            <div id="searchResults" class="search-results"></div>
         </div>
 
-<div class="nav-actions">
-    <a href="https://discord.gg/SNbNbUq8hu" target="_blank" class="btn-circle" style="background: #5865F2;">
-        <i class="fab fa-discord"></i>
-    </a>
-    <a href="pages/suporte.html" class="btn-circle" style="background: #ff4757;">
-        <i class="fas fa-headset"></i>
-    </a>
-    
-    <button class="btn-circle" id="addGameBtn"><i class="fas fa-plus"></i></button>
-    <button class="btn-circle" id="themeBtn"><i class="fas fa-sun" id="themeIcon"></i></button>
-</div><div class="nav-actions">
-    <a href="https://discord.gg/SNbNbUq8hu" target="_blank" class="btn-circle" style="background: #5865F2;">
-        <i class="fab fa-discord"></i>
-    </a>
-    <a href="pages/suporte.html" class="btn-circle" style="background: #ff4757;">
-        <i class="fas fa-headset"></i>
-    </a>
-    
-    <button class="btn-circle" id="addGameBtn"><i class="fas fa-plus"></i></button>
-    <button class="btn-circle" id="themeBtn"><i class="fas fa-sun" id="themeIcon"></i></button>
-</div>
+        <div class="nav-actions">
+            <a href="https://discord.gg/SNbNbUq8hu" target="_blank" class="btn-circle" style="background: #5865F2;">
+                <i class="fab fa-discord" style="color: white;"></i>
+            </a>
+            <a href="pages/suporte.html" class="btn-circle" style="background: #ff4757;">
+                <i class="fas fa-headset" style="color: white;"></i>
+            </a>
+            <button class="btn-circle" id="addGameBtn"><i class="fas fa-plus"></i></button>
+            <button class="btn-circle" id="themeBtn"><i class="fas fa-sun" id="themeIcon"></i></button>
+        </div>
+    </header>
 
-    <div id="games-grid"></div>
-    <div id="loading-trigger">Carregando...</div>
+    <div class="container">
+        <div id="loading-trigger">
+            <i class="fas fa-spinner fa-spin"></i> Buscando jogos no repositório...
+        </div>
+        <div class="grid" id="games-grid"></div>
+    </div>
 
-    <script type="module" src="js/indexlogic.js"></script>
+    <script src="js/indexlogic.js"></script>
 </body>
 </html>
