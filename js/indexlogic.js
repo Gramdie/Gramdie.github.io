@@ -1,12 +1,13 @@
 const SHEETDB_URL = "https://sheetdb.io/api/v1/9sv7pjhrhpwbq";
 
-// Seletores do DOM
+// Seletores de Elementos
 const gamesGrid = document.getElementById('games-grid');
 const loadingTrigger = document.getElementById('loading-trigger');
 const themeBtn = document.getElementById('themeBtn');
 const addGameBtn = document.getElementById('addGameBtn');
+const searchInput = document.getElementById('searchInput');
 
-// --- LÓGICA DO TEMA ---
+// --- 1. SISTEMA DE TEMA ---
 if (themeBtn) {
     themeBtn.onclick = () => {
         document.body.classList.toggle('light-mode');
@@ -16,75 +17,101 @@ if (themeBtn) {
         localStorage.setItem('theme', isLight ? 'light' : 'dark');
     };
 }
+
+// Aplica tema salvo ao iniciar
 if (localStorage.getItem('theme') === 'light') {
     document.body.classList.add('light-mode');
     const icon = document.getElementById('themeIcon');
     if (icon) icon.className = 'fas fa-moon';
 }
 
-// --- LÓGICA DO BOTÃO ADICIONAR (BUG RESOLVIDO) ---
+// --- 2. LÓGICA DA BARRA DE PESQUISA (Enter para Search.html) ---
+if (searchInput) {
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const query = searchInput.value.trim();
+            if (query !== "") {
+                // Redireciona para a pasta pages com o termo da busca
+                window.location.href = `pages/search.html?query=${encodeURIComponent(query)}`;
+            }
+        }
+    });
+}
+
+// --- 3. BOTÃO ADICIONAR JOGO ---
 if (addGameBtn) {
     addGameBtn.onclick = () => {
-        // Redireciona para a página de criação na pasta pages
-        window.location.href = 'pages/creategame.html'; 
+        window.location.href = 'pages/creategame.html';
     };
 }
 
-// --- FUNÇÃO DE CARREGAMENTO DOS JOGOS ---
+// --- 4. CARREGAMENTO E RENDERIZAÇÃO DOS JOGOS ---
 async function carregarJogos() {
     try {
         const response = await fetch(SHEETDB_URL);
-        if (!response.ok) throw new Error("Erro de conexão");
+        if (!response.ok) throw new Error("Falha ao conectar com a API");
 
         const data = await response.json();
 
+        // Remove o sinal de carregamento
         if (loadingTrigger) loadingTrigger.style.display = 'none';
         if (!gamesGrid) return;
 
         gamesGrid.innerHTML = '';
 
+        // Exibe do mais novo para o mais antigo
         [...data].reverse().forEach(jogo => {
             const card = document.createElement('div');
             card.className = 'game-card';
             
-            // Redirecionamento para o post com ID
+            // Redireciona para a página do post usando o ID
             card.onclick = () => {
                 window.location.href = `pages/post.html?id=${jogo.id}`;
             };
 
-            // Lógica para descrição e tags (Fallback se a coluna não existir)
-            const descPost = jogo.description || "Descrição ainda não adicionada na planilha.";
+            // Trata descrição e gêneros (Fallbacks caso as colunas estejam vazias)
+            const descricao = jogo.description || "Nenhuma descrição disponível no momento.";
             const generosRaw = jogo.genres || "Geral";
             
             const tagsHTML = generosRaw.split(',')
                 .map(g => `<span class="tag-genre">${g.trim()}</span>`)
                 .join('');
 
-            // Identificação do provedor
-            const link = jogo.mainLink || "";
-            const providerName = link.includes('mediafire') ? 'Mediafire' : 'Cloud Store';
+            // Define o provedor baseado no link
+            const linkDownload = (jogo.mainLink || "").toLowerCase();
+            const provedor = linkDownload.includes('mediafire') ? 'Mediafire' : 'Cloud Store';
 
             card.innerHTML = `
-                <img src="${jogo.banner}" alt="${jogo.title}" onerror="this.src='https://placehold.co/600x400?text=Imagem+Indisponivel'">
+                <img src="${jogo.banner}" alt="${jogo.title}" onerror="this.src='https://placehold.co/600x400?text=Imagem+Indisponível'">
                 <div class="card-content">
-                    <span class="post-date">${jogo.date || 'Disponível'}</span>
-                    <h3 class="game-title">${jogo.title || 'Sem Título'}</h3>
-                    <p class="card-desc">${descPost}</p>
+                    <span class="post-date">${jogo.date || 'Recente'}</span>
+                    <h3 class="game-title">${jogo.title || 'Título Indisponível'}</h3>
+                    <p class="card-desc">${descricao}</p>
                     <div class="genre-tags">${tagsHTML}</div>
                     <div class="provider-tags">
-                        <span class="tag-provider"><i class="fas fa-cloud"></i> ${providerName}</span>
-                        <span class="status-online">● Online</span>
+                        <span class="tag-provider">
+                            <i class="fas fa-cloud"></i> ${provedor}
+                        </span>
+                        <span class="tag-provider" style="color: #2ecc71;">
+                            <i class="fas fa-check-circle"></i> Online
+                        </span>
                     </div>
-                    <div class="btn-download">Ver Detalhes</div>
+                    <div class="btn-details">Ver Detalhes</div>
                 </div>
             `;
             gamesGrid.appendChild(card);
         });
 
     } catch (err) {
-        console.error("Erro ao listar jogos:", err);
-        if (loadingTrigger) loadingTrigger.innerHTML = "Erro ao carregar o catálogo.";
+        console.error("Erro crítico:", err);
+        if (loadingTrigger) {
+            loadingTrigger.innerHTML = `
+                <i class="fas fa-exclamation-circle" style="color: #ff4757;"></i>
+                <p>Erro ao carregar catálogo. Tente atualizar a página.</p>
+            `;
+        }
     }
 }
 
+// Inicia o carregamento quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', carregarJogos);
