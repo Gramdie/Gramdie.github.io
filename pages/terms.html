@@ -1,1 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termos de Uso - Gramdie Games</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --text-gray: #888888;
+            --blue: #1e90ff;
+            --red: #ff4757;
+            --border: #2a2a2a;
+        }
 
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inclusive Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            padding: 20px 5%;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            color: var(--blue);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 5%;
+        }
+
+        .terms-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .terms-header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        /* Estrutura de Mapa Mental / Cards */
+        .mind-map {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            position: relative;
+        }
+
+        .term-node {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .term-node:hover {
+            border-color: var(--blue);
+            transform: scale(1.01);
+        }
+
+        .term-node h2 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--blue);
+            font-size: 22px;
+        }
+
+        .important-box {
+            background: rgba(255, 71, 87, 0.1);
+            border-left: 5px solid var(--red);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .red-text {
+            color: var(--red);
+            font-weight: bold;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 50px;
+            color: var(--text-gray);
+            font-size: 14px;
+            padding-bottom: 50px;
+        }
+
+        .step-path {
+            background: #111;
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 15px;
+        }
+
+        i { width: 25px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="../index.html" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+        <h2 style="margin: 0; font-size: 20px;">Gramdie Games</h2>
+    </header>
+
+    <div class="container">
+        <div class="terms-header">
+            <h1>Termos e Condições</h1>
+            <p style="color: var(--text-gray);">Leia atentamente como funciona a nossa comunidade e suas responsabilidades.</p>
+        </div>
+
+        <div class="mind-map">
+            
+            <div class="term-node">
+                <h2><i class="fas fa-shield-virus"></i> 01. Segurança e Vírus</h2>
+                <p>É estritamente <strong>PROIBIDO</strong> o compartilhamento de qualquer software mal intencionado (vírus, cavalos de troia, spywares ou malwares) que visem danificar o computador de terceiros.</p>
+                
+                <div class="important-box">
+                    <strong>Como agir em caso de suspeita?</strong><br>
+                    Todo software identificado como perigoso deve ser denunciado imediatamente seguindo este caminho:
+                    <br>
+                    <div class="step-path">
+                        <span class="red-text">Denunciar</span> > Motivo > Software mal intencionado
+                    </div>
+                </div>
+            </div>
+
+            <div class="term-node">
+                <h2><i class="fas fa-balance-scale"></i> 02. Responsabilidade do Conteúdo</h2>
+                <p>O desenvolvedor deste site <strong>não se responsabiliza</strong> pelos softwares ou arquivos postados de forma ilegal (violação de direitos autorais ou pirataria).</p>
+                <p>Toda e qualquer responsabilidade civil ou criminal sobre o conteúdo compartilhado recai exclusivamente sobre o <strong>usuário que realizou a postagem</strong>.</p>
+            </div>
+
+            <div class="term-node">
+                <h2><i class="fas fa-users"></i> 03. Conduta do Usuário</h2>
+                <p>Ao utilizar a plataforma, você concorda em manter um ambiente respeitoso. Postagens que contenham conteúdo ofensivo, discriminatório ou que violem a privacidade de terceiros serão removidas sem aviso prévio.</p>
+            </div>
+
+            <div class="term-node">
+                <h2><i class="fas fa-sync-alt"></i> 04. Mudanças nos Termos</h2>
+                <p>Estes termos podem ser atualizados a qualquer momento para refletir melhorias na segurança ou mudanças na legislação vigente. O uso contínuo do site implica na aceitação das novas regras.</p>
+            </div>
+
+        </div>
+
+        <div class="footer-note">
+            Ao navegar no Gramdie Games, você confirma que leu e concorda com todos os pontos citados acima.
+        </div>
+    </div>
+
+</body>
+</html>
