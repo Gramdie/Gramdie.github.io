@@ -33,127 +33,115 @@
             color: var(--text-main);
             font-family: 'Inclusive Sans', sans-serif;
             margin: 0;
-            transition: background-color 0.3s, color 0.3s;
+            transition: 0.3s;
+            overflow-x: hidden;
         }
 
+        /* --- HEADER --- */
         header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding: 10px 5%;
+            align-items: center;
+            padding: 15px 5%;
             border-bottom: 1px solid var(--header-border);
-            background-color: var(--bg);
             position: sticky;
             top: 0;
+            background: var(--bg);
             z-index: 1000;
         }
 
-        .logo {
-            display: flex;
-            flex-direction: column;
-            text-decoration: none;
-            color: var(--text-main);
-        }
+        .logo-area { display: flex; align-items: baseline; cursor: pointer; }
+        .logo-area h1 { font-size: 24px; margin: 0; letter-spacing: -1px; }
+        .logo-area span { color: var(--blue); font-size: 16px; margin-left: 5px; font-weight: bold; }
 
-        .logo span:first-child { font-weight: bold; font-size: 20px; }
-        .logo span:last-child { font-size: 10px; color: var(--blue); text-transform: uppercase; }
-
-        .search-container {
-            flex-grow: 1;
-            max-width: 400px;
-            margin: 0 20px;
-        }
-
+        .search-container { flex: 1; max-width: 350px; margin: 0 20px; }
         .search-box {
+            display: flex;
+            align-items: center;
             background: var(--search-bg);
-            border-radius: 12px;
             padding: 8px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            border-radius: 20px;
             border: 1px solid var(--header-border);
+            transition: 0.2s;
         }
-
+        .search-box:focus-within { border-color: var(--blue); }
         .search-box input {
-            background: transparent;
-            border: none;
-            color: var(--text-main);
-            width: 100%;
-            outline: none;
-            font-family: inherit;
+            background: none; border: none; color: var(--text-main);
+            margin-left: 10px; outline: none; width: 100%; font-family: inherit;
         }
 
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        /* --- AÇÕES E BOTÕES --- */
+        .nav-actions { display: flex; gap: 10px; align-items: center; }
 
         .btn-text {
             color: var(--text-main);
             text-decoration: none;
             font-size: 14px;
             font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: 0.2s;
         }
+        .btn-text:hover { background: rgba(30, 144, 255, 0.1); color: var(--blue); }
 
         .btn-circle {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: none;
-            background: var(--card-bg);
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: 0.2s;
-            text-decoration: none;
+            width: 40px; height: 40px; border-radius: 50%; border: none;
+            background: var(--card-bg); color: var(--text-main); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; text-decoration: none; font-size: 16px;
         }
+        .btn-circle:hover { transform: scale(1.1); filter: brightness(1.2); }
 
-        .btn-circle:hover {
-            background: var(--blue);
-            color: white;
-        }
-
+        /* --- CONTEÚDO --- */
         .container { padding: 40px 5%; }
-
+        
         #games-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 25px;
         }
 
-        #loading-trigger {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 50px;
-            color: var(--text-gray);
-        }
-
-        /* Estilos dos Cards (Gerados via JS) */
+        /* --- CARDS --- */
         .game-card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            overflow: hidden;
-            border: 1px solid var(--header-border);
-            transition: 0.3s;
-            cursor: pointer;
+            background: var(--card-bg); border-radius: 15px; overflow: hidden;
+            transition: 0.3s; border: 1px solid transparent; cursor: pointer;
+            display: flex; flex-direction: column; height: 100%;
         }
+        .game-card:hover { border-color: #444; transform: translateY(-5px); }
+        .game-card img { width: 100%; height: 170px; object-fit: cover; background: #222; }
 
-        .game-card:hover { transform: translateY(-5px); border-color: var(--blue); }
-        .card-content { padding: 15px; }
-        .game-title { margin: 10px 0; font-size: 18px; color: var(--text-main); }
-        .card-desc { font-size: 13px; color: var(--text-gray); line-height: 1.4; }
+        .card-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .post-date { font-size: 11px; color: var(--text-gray); margin-bottom: 5px; }
+        .game-title { font-size: 19px; margin: 0; font-weight: bold; color: var(--text-main); }
+        .card-desc { font-size: 14px; color: var(--text-gray); margin: 12px 0; line-height: 1.5; flex-grow: 1; }
+        
+        .genre-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 15px; }
+        .tag-genre { font-size: 10px; padding: 4px 10px; border-radius: 5px; background: rgba(255,255,255,0.05); color: #ccc; }
+
+        .provider-tags { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .tag-provider { font-size: 11px; color: var(--blue); font-weight: bold; display: flex; align-items: center; gap: 5px; }
+
+        .btn-details {
+            background: var(--blue); color: white; padding: 12px; border-radius: 10px;
+            text-decoration: none; font-weight: bold; text-align: center;
+            transition: 0.2s; font-size: 14px;
+        }
+        .btn-details:hover { opacity: 0.9; }
+
+        /* --- FEEDBACK --- */
+        #loading-trigger { 
+            text-align: center; padding: 60px; color: var(--text-gray); 
+            grid-column: 1 / -1; width: 100%;
+        }
+        .fa-spin { margin-bottom: 10px; font-size: 24px; color: var(--blue); }
     </style>
 </head>
 <body>
 
     <header>
-        <a href="index.html" class="logo">
-            <span>Gramdie</span>
-            <span>Games</span>
-        </a>
+        <div class="logo-area" onclick="window.location.href='index.html'">
+            <h1>Gramdie</h1><span>Games</span>
+        </div>
 
         <div class="search-container">
             <div class="search-box">
@@ -163,13 +151,17 @@
         </div>
 
         <div class="nav-actions">
-            <a href="pages/filtrar.html" class="btn-text">Filtrar</a>
-            <a href="pages/suporte.html" class="btn-text">Suporte</a>
+            <a href="pages/filter.html" class="btn-text">Filtrar</a>
+            <a href="pages/terms.html" class="btn-text">Termos</a>
 
             <a href="https://discord.gg/SNbNbUq8hu" target="_blank" class="btn-circle" style="background: #5865F2;">
                 <i class="fab fa-discord" style="color: white;"></i>
             </a>
             
+            <a href="pages/suport.html" class="btn-circle" style="background: #ff4757;">
+                <i class="fas fa-headset" style="color: white;"></i>
+            </a>
+
             <button class="btn-circle" id="addGameBtn" title="Adicionar Jogo">
                 <i class="fas fa-plus"></i>
             </button>
@@ -183,8 +175,8 @@
     <div class="container">
         <div id="games-grid">
             <div id="loading-trigger">
-                <i class="fas fa-circle-notch fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i>
-                <p>Sincronizando banco de dados...</p>
+                <i class="fas fa-circle-notch fa-spin"></i>
+                <p>Sincronizando com o banco de dados...</p>
             </div>
         </div>
     </div>
