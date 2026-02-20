@@ -1,61 +1,62 @@
 const SHEETDB_URL = "https://sheetdb.io/api/v1/9sv7pjhrhpwbq"; 
 
-// Seletores
+// Seletores principais
 const gamesGrid = document.getElementById('games-grid');
 const loadingTrigger = document.getElementById('loading-trigger');
-const searchInput = document.getElementById('searchInput');
-const searchResults = document.getElementById('searchResults');
-
-let gamesData = []; 
-
-// --- LÓGICA DOS BOTÕES (TEMA E ADICIONAR) ---
 const themeBtn = document.getElementById('themeBtn');
+const addGameBtn = document.getElementById('addGameBtn');
+
+// --- LÓGICA DO TEMA ---
 if (themeBtn) {
     themeBtn.onclick = () => {
         document.body.classList.toggle('light-mode');
         const isLight = document.body.classList.contains('light-mode');
-        document.getElementById('themeIcon').className = isLight ? 'fas fa-moon' : 'fas fa-sun';
+        const icon = document.getElementById('themeIcon');
+        if (icon) icon.className = isLight ? 'fas fa-moon' : 'fas fa-sun';
         localStorage.setItem('theme', isLight ? 'light' : 'dark');
     };
 }
-if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
+// Aplica o tema salvo ao carregar
+if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light-mode');
+    const icon = document.getElementById('themeIcon');
+    if (icon) icon.className = 'fas fa-moon';
+}
 
-// --- FUNÇÃO DE CARREGAMENTO CORRIGIDA ---
+// --- LÓGICA DO BOTÃO ADICIONAR (CORRIGIDO) ---
+if (addGameBtn) {
+    addGameBtn.onclick = () => {
+        // Redireciona para a página de criação de posts
+        window.location.href = 'pages/creategame.html'; 
+    };
+}
+
+// --- FUNÇÃO DE CARREGAMENTO DOS JOGOS ---
 async function carregarJogos() {
-    console.log("Iniciando busca de dados...");
-    
-    // Forçar o sumiço do loading após 5 segundos caso a rede trave
-    setTimeout(() => {
-        if (loadingTrigger && loadingTrigger.style.display !== 'none') {
-            loadingTrigger.innerHTML = "Tempo de resposta excedido. Tente atualizar.";
-        }
-    }, 5000);
-
     try {
         const response = await fetch(SHEETDB_URL);
-        
-        // Se a resposta demorar ou falhar silenciosamente
-        if (!response.ok) throw new Error("Falha na resposta da API");
+        if (!response.ok) throw new Error("Erro na resposta da API");
 
-        gamesData = await response.json();
-        console.log("Dados recebidos:", gamesData);
+        const gamesData = await response.json();
 
-        // LIMPEZA OBRIGATÓRIA
+        // Limpa o estado de carregamento
         if (loadingTrigger) loadingTrigger.style.display = 'none';
         if (gamesGrid) gamesGrid.innerHTML = '';
 
-        if (!gamesData || gamesData.length === 0) {
-            gamesGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Nenhum jogo encontrado na planilha.</p>';
-            return;
-        }
-
-        // Renderização dos cards
+        // Inverte a ordem para mostrar os mais recentes primeiro
         [...gamesData].reverse().forEach(jogo => {
             const card = document.createElement('div');
             card.className = 'game-card';
-            card.onclick = () => window.location.href = `pages/post.html?id=${jogo.id}`;
+            
+            // Configura o clique para abrir o post com o ID correto
+            card.onclick = () => {
+                if (jogo.id) {
+                    window.location.href = `pages/post.html?id=${jogo.id}`;
+                } else {
+                    console.log("Aviso: Jogo sem ID definido na planilha");
+                }
+            };
 
-            // Tags de Categoria e Provedor
             const tagsGenero = jogo.genres 
                 ? jogo.genres.split(',').map(g => `<span class="tag-genre">${g.trim()}</span>`).join('') 
                 : '<span class="tag-genre">Geral</span>';
@@ -67,23 +68,23 @@ async function carregarJogos() {
                 <div class="card-content">
                     <span class="post-date">${jogo.date || 'Disponível'}</span>
                     <h3 style="margin: 0; font-size: 18px;">${jogo.title}</h3>
-                    <p class="card-desc">${jogo.description || 'Sem descrição.'}</p>
+                    <p class="card-desc">${jogo.description || 'Sem descrição disponível.'}</p>
                     <div class="genre-tags">${tagsGenero}</div>
                     <div class="provider-tags">
                         <span class="tag-provider"><i class="fas fa-cloud"></i> ${provider}</span>
                         <span class="tag-provider" style="color: #2ecc71;">● Online</span>
                     </div>
-                    <a href="#" class="btn-download">Ver Detalhes</a>
+                    <span class="btn-download">Ver Detalhes</span>
                 </div>
             `;
             gamesGrid.appendChild(card);
         });
 
     } catch (err) {
-        console.error("Erro ao carregar jogos:", err);
-        if (loadingTrigger) loadingTrigger.innerHTML = "Erro ao conectar com o servidor.";
+        console.log("Erro ao carregar os dados do SheetDB");
+        if (loadingTrigger) loadingTrigger.innerHTML = "Erro ao conectar com o servidor";
     }
 }
 
-// Inicialização
+// Inicialização ao carregar o DOM
 document.addEventListener('DOMContentLoaded', carregarJogos);
