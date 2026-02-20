@@ -1,1 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busca - Gramdie Games</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #121212;
+            --header-border: #2a2a2a;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --text-gray: #888888;
+            --blue: #1e90ff;
+        }
 
+        body.light-mode {
+            --bg: #ffffff;
+            --header-border: #eeeeee;
+            --card-bg: #f9f9f9;
+            --text-main: #121212;
+            --text-gray: #666666;
+            --blue: #007bff;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inclusive Sans', sans-serif;
+            margin: 0;
+            transition: 0.3s;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            padding: 15px 5%;
+            border-bottom: 1px solid var(--header-border);
+            background: var(--bg);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            gap: 20px;
+        }
+
+        .btn-back {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 20px;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--card-bg);
+        }
+        .btn-back:hover { background: var(--blue); color: white; }
+
+        .search-info {
+            flex-grow: 1;
+        }
+        .search-info h1 { font-size: 18px; margin: 0; }
+        .search-info span { color: var(--blue); font-weight: bold; }
+
+        .container { padding: 40px 5%; }
+
+        /* Grid de Resultados */
+        #search-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        /* Estilo dos Cards (Igual ao Index para consistência) */
+        .game-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: 0.3s;
+            border: 1px solid transparent;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+        .game-card:hover { border-color: #444; transform: translateY(-5px); }
+        .game-card img { width: 100%; height: 160px; object-fit: cover; }
+        
+        .card-content { padding: 15px; flex-grow: 1; }
+        .game-id { font-size: 10px; color: var(--text-gray); text-transform: uppercase; letter-spacing: 1px; }
+        .game-title { font-size: 17px; margin: 5px 0; font-weight: bold; }
+        
+        .genre-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
+        .tag-genre { font-size: 10px; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.05); color: #ccc; }
+
+        #loading-state {
+            text-align: center;
+            padding: 50px;
+            color: var(--text-gray);
+            grid-column: 1 / -1;
+        }
+
+        .no-results {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 100px 20px;
+        }
+        .no-results i { font-size: 50px; color: var(--text-gray); margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="../index.html" class="btn-back">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <div class="search-info">
+            <h1>Resultados para: <span id="searchTermDisplay">...</span></h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="search-results">
+            <div id="loading-state">
+                <i class="fas fa-circle-notch fa-spin" style="font-size: 30px; color: var(--blue);"></i>
+                <p>Filtrando no banco de dados...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/searchlogic.js"></script>
+    <script>
+        // Aplicar o tema salvo no localStorage imediatamente para evitar flash branco
+        if (localStorage.getItem('theme') === 'light') {
+            document.body.classList.add('light-mode');
+        }
+    </script>
+</body>
+</html>
