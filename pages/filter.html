@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busca Avançada - Gramdie Games</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inclusive+Sans&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --text-gray: #888888;
+            --blue: #1e90ff;
+            --border: #2a2a2a;
+            --input-bg: #252525;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inclusive Sans', sans-serif;
+            margin: 0;
+            transition: 0.3s;
+        }
+
+        header {
+            padding: 15px 5%;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: var(--bg);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .btn-back {
+            color: var(--text-main);
+            text-decoration: none;
+            background: var(--card-bg);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container { padding: 40px 5%; max-width: 600px; margin: 0 auto; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-size: 13px; 
+            color: var(--text-gray); 
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-main);
+            font-family: inherit;
+            box-sizing: border-box;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .form-group input:focus { border-color: var(--blue); }
+
+        .btn-search-advanced {
+            width: 100%;
+            padding: 15px;
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+        .btn-search-advanced:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        .info-text {
+            font-size: 12px;
+            color: var(--text-gray);
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="../index.html" class="btn-back"><i class="fas fa-arrow-left"></i></a>
+        <h1 style="font-size: 20px;">Filtro Detalhado</h1>
+    </header>
+
+    <div class="container">
+        <div class="form-group">
+            <label><i class="fas fa-heading"></i> Título do Jogo</label>
+            <input type="text" id="f-title" placeholder="Ex: Grand Theft Auto">
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-fingerprint"></i> ID Único</label>
+            <input type="text" id="f-id" placeholder="Ex: 101">
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-calendar"></i> Data de Postagem</label>
+            <input type="text" id="f-date" placeholder="Ex: 2026 ou 19/02">
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-align-left"></i> Parte da Descrição</label>
+            <input type="text" id="f-desc" placeholder="Palavras contidas na descrição...">
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-link"></i> Site de Download (URL/Provedor)</label>
+            <input type="text" id="f-url" placeholder="Ex: mediafire.com ou mega.nz">
+        </div>
+
+        <button class="btn-search-advanced" id="applyFilterBtn">
+            <i class="fas fa-search"></i> Filtrar Agora
+        </button>
+
+        <p class="info-text">Os campos deixados em branco serão ignorados na busca.</p>
+    </div>
+
+    <script src="../js/filterlogic.js"></script>
+</body>
+</html>
